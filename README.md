@@ -23,8 +23,8 @@ on your computer to run these commands:
 
 ```bash
 # ...or you can clone the code repository and install its dependencies
-git clone https://github.com/hoepjhsha/ptpmhdv-nhom-7-symfony.git
-cd ptpmhdv-nhom-7-symfony/
+git clone https://github.com/hoepjhsha/ptpmhdv-nhom-7-symfony-final.git
+cd ptpmhdv-nhom-7-symfony-final/
 composer install
 ```
 
@@ -37,7 +37,7 @@ There's no need to configure anything before running the application. There are
 **Option 1.** [Download Symfony CLI][4] and run this command:
 
 ```bash
-cd ptpmhdv-nhom-7-symfony/
+cd ptpmhdv-nhom-7-symfony-final/
 symfony serve
 ```
 
@@ -49,7 +49,7 @@ Then access the application in your browser at the given URL (<https://localhost
 On your local machine, you can run this command to use the built-in PHP web server:
 
 ```bash
-cd ptpmhdv-nhom-7-symfony/
+cd ptpmhdv-nhom-7-symfony-final/
 php -S localhost:8000 -t public/
 ```
 
@@ -59,7 +59,7 @@ Tests
 Execute this command to run tests:
 
 ```bash
-cd ptpmhdv-nhom-7-symfony/
+cd ptpmhdv-nhom-7-symfony-final/
 ./bin/phpunit
 ```
 
