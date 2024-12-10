@@ -1,0 +1,90 @@
+{% extends "_layouts/shop/main.html.twig" %}
+
+{% block main %}
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="card">
+                <div class="card-body">
+                    <div class="table-responsive shopping-cart">
+                        <table class="table mb-0">
+                            <thead>
+                            <tr>
+                                <th class="border-top-0">Product</th>
+                                <th class="border-top-0">Price</th>
+                                <th class="border-top-0">Quantity</th>
+                                <th class="border-top-0">Total</th>
+                                <th class="border-top-0">Action</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            <form id="updateCartForm" action="{{ path('shop_cart_update') }}" method="POST">
+                            {% if orderItems is not null %}
+                                {% for orderItem in orderItems %}
+                                    <tr>
+                                        <td>
+                                            <img src="{{ orderItem.item.itemImage }}" alt="" height="36">
+                                            <p class="d-inline-block align-middle mb-0">
+                                                <a href="{{ url('shop_view', {id: orderItem.item.id}) }}" class="d-inline-block align-middle mb-0 product-name">{{ orderItem.item.itemName }}</a>
+                                                <br>
+                                                <span class="text-muted font-13">Category: {{ orderItem.item.category.categoryName }}</span>
+                                            </p>
+                                        </td>
+                                        <td>{{ orderItem.item.itemPrice }}</td>
+                                        <td>
+                                            <input class="form-control form-control-sm w-25" name="quantity[{{ orderItem.id }}]" type="number" value="{{ orderItem.quantity }}" id="example-number-input1">
+                                        </td>
+                                        <td>{{ (orderItem.item.itemPrice * orderItem.quantity) | number_format(0, ',', '.') }} VND</td>
+                                        <td>
+                                            <a href="{{ url('shop_cart_remove', {id: orderItem.item.id}) }}" class="text-dark"><i class="mdi mdi-close-circle-outline font-18"></i></a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% endif %}
+                            </form>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="row">
+                        <div class="col-12 d-flex justify-content-end">
+                            <br>
+                            <div class="button-items">
+                                <button type="button" class="btn btn-primary me-3" onclick="document.getElementById('updateCartForm').submit()">Update</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row justify-content-center">
+                        <div class="col-md-6 align-self-center">
+                            <div class="mt-4">
+                                <div class="row">
+                                    <div class="col-6">
+                                        <a href="{{ url('shop_list') }}" class="apps-ecommerce-products.html"><i class="fas fa-long-arrow-alt-left me-1"></i> Continue Shopping</a>
+                                    </div>
+                                    <div class="col-6 text-right">
+                                        <a href="{{ url('shop_checkout') }}" class="">Checkout <i class="fas fa-long-arrow-alt-right ms-1"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div><!--end col-->
+                        <div class="col-md-6">
+                            <div class="total-payment p-3">
+                                <h6 class="header-title font-14">Total Payment</h6>
+                                <table class="table">
+                                    <tbody>
+                                    <tr>
+                                        <td class="payment-title">Subtotal</td>
+                                        <td>{{ totalMoney | number_format(0, ',', '.') }} VND</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="payment-title">Total</td>
+                                        <td class="text-dark"><strong>{{ totalMoney | number_format(0, ',', '.') }} VND</strong></td>
+                                    </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div><!--end col-->
+                    </div><!--end row-->
+                </div><!--end card-->
+            </div><!--end card-body-->
+        </div><!--end col-->
+    </div><!--end row-->
+{% endblock %}

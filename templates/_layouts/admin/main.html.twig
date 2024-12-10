@@ -1,0 +1,67 @@
+{% extends "base.html.twig" %}
+
+{% block title %}
+    Dashboard
+{% endblock %}
+
+{% block stylesheets %}
+    <!-- jvectormap -->
+    <link href="{{ asset('plugins/jvectormap/jquery-jvectormap-2.0.2.css') }}" rel="stylesheet">
+
+    <!-- App css -->
+    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/icons.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/metisMenu.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('plugins/daterangepicker/daterangepicker.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/app.min.css') }}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block javascripts %}
+    <!-- jQuery  -->
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
+    <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('js/metismenu.min.js') }}"></script>
+    <script src="{{ asset('js/waves.js') }}"></script>
+    <script src="{{ asset('js/feather.min.js') }}"></script>
+    <script src="{{ asset('js/simplebar.min.js') }}"></script>
+    <script src="{{ asset('js/moment.js') }}"></script>
+    <script src="{{ asset('plugins/daterangepicker/daterangepicker.js') }}"></script>
+
+    <script src="{{ asset('plugins/apex-charts/apexcharts.min.js') }}"></script>
+    <script src="{{ asset('plugins/apex-charts/irregular-data-series.js') }}"></script>
+    <script src="{{ asset('plugins/apex-charts/ohlc.js') }}"></script>
+    <script src="{{ asset('pages/jquery.apexcharts.init.js') }}"></script>
+    <!-- <script src="assets/pages/jquery.rtl-apexcharts.init.js"></script> -->
+
+    <!-- App js -->
+    <script src="{{ asset('js/app.js') }}"></script>
+
+    {% include "_widgets/sweetalert2.html.twig" %}
+{% endblock %}
+
+{% block content %}
+
+    {% include '_components/admin/leftside-nav.html.twig' %}
+
+    <div class="page-wrapper">
+
+        {% include '_components/admin/topbar-start.html.twig' %}
+
+        <!-- Page Content-->
+        <div class="page-content">
+            <div class="container-fluid">
+
+                {% include '_components/admin/page-title.html.twig' %}
+
+                {% block main %}{% endblock %}
+
+            </div><!-- container -->
+
+            {% include '_components/admin/footer.html.twig' %}
+
+        </div>
+        <!-- end page content -->
+    </div>
+    <!-- end page-wrapper -->
+
+{% endblock %}

@@ -1,0 +1,82 @@
+{% extends "_layouts/admin/main.html.twig" %}
+
+{% block title %}
+    Categories {{ parent() }}
+{% endblock %}
+
+{% block main %}
+
+    <div class="row">
+        <div class="col-7">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h4 class="card-title">Detail Item: {{ category.name }}</h4>
+                </div><!--end card-header-->
+                <div class="card-body">
+                    <div class="row">
+                        <div class="table-responsive">
+                            <table class="table table-striped mb-0">
+                                <tr>
+                                    <td>Id:</td>
+                                    <td>{{ category.id }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Category Name:</td>
+                                    <td>{{ category.name }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div><!--end row-->
+                </div>
+                <div class="card-footer">
+                    <div class="row">
+                        <div class="button-items d-flex align-items-center justify-content-center gap-3">
+                            <a href="{{ category.action.update }}" type="button" class="btn btn-warning text-white btn-lg col-1">Edit</a>
+
+                            <a onclick="confirmDelete()" type="button" class="btn btn-danger btn-lg">Delete</a>
+
+                            <form id="delete-form-{{ category.id }}" method="post" action="{{ url('admin_category_delete', {id: category.id}) }}">
+                                <input type="hidden" name="_delete_id" value="{{ category.id }}">
+                            </form>
+                            <script>
+                                function confirmDelete() {
+                                    const swalWithBootstrapButtons = Swal.mixin({
+                                        customClass: {
+                                            confirmButton: 'btn btn-primary mr-10 me-1',
+                                            cancelButton: 'btn btn-danger mr-10 me-1'
+                                        },
+                                        buttonsStyling: false
+                                    });
+                                    swalWithBootstrapButtons.fire({
+                                        title: "Are you sure you want to delete?",
+                                        text: "This action can not be reverted!",
+                                        icon: "warning",
+                                        showCancelButton: true,
+                                        confirmButtonText: "Yes, delete it!",
+                                        cancelButtonText: "No, cancel!",
+                                        reverseButtons: true
+                                    }).then((result) => {
+                                        if (result.isConfirmed) {
+                                            document.getElementById('delete-form-{{ category.id }}').submit();
+                                        } else if (
+                                            result.dismiss === Swal.DismissReason.cancel
+                                        ) {
+                                            swalWithBootstrapButtons.fire({
+                                                title: "Cancelled",
+                                                text: "This action has been cancelled :)",
+                                                icon: "error"
+                                            });
+                                        }
+                                    });
+                                }
+                            </script>
+
+                            <a href="{{ url('admin_category_list') }}" type="button" class="btn btn-primary btn-lg">Back</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- end col -->
+    </div> <!-- end row -->
+
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends "_layouts/shop/main.html.twig" %}
+
+{% block stylesheets %}
+    <!-- DataTables -->
+    <link href="{{ asset('plugins/datatables/dataTables.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('plugins/datatables/buttons.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
+
+    {{ parent() }}
+{% endblock %}
+
+{% block js %}
+    <!-- Required datatable js -->
+    <script src="{{ asset('plugins/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('plugins/datatables/dataTables.bootstrap5.min.js') }}"></script>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        $('#datatable').DataTable();
+    </script>
+{% endblock %}
+
+{% block main %}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h4 class="card-title">Default Datatable</h4>
+                </div><!--end card-header-->
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="datatable" class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th></th>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+
+                            {% if items is not null %}
+                            {% for item in items %}
+                                <tr>
+                                    <td> {{ loop.index }}</td>
+                                    <td class="d-flex align-items-center">
+                                        <img src="{{ item.image }}" alt="" height="40">
+                                        <p class="d-inline-block align-middle mb-0">
+                                            <a href="{{ item.action.view }}" class="d-inline-block align-middle mb-0 product-name" style="white-space: normal; word-wrap: break-word; margin: 5px">{{ item.name }}</a>
+                                            <br>
+                                        </p>
+                                    </td>
+                                    <td>{{ item.category }}</td>
+                                    <td>{{ item.price | number_format(0, ',', '.') }} VND</td>
+                                    <td>
+                                        <a class="fa fa-shopping-cart" href="{{ item.action.view }}" style="cursor:pointer;"></a>
+{#                                        <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">#}
+{#                                            <div class="modal-dialog modal-dialog-centered" role="document">#}
+{#                                                <div class="modal-content">#}
+{#                                                    <div class="modal-header">#}
+{#                                                        <h6 class="modal-title m-0" id="exampleModalCenterTitle">Input quantity</h6>#}
+{#                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>#}
+{#                                                    </div><!--end modal-header-->#}
+{#                                                    <div class="modal-body">#}
+{#                                                        <div class="row">#}
+{#                                                            <div class="col-lg-9">#}
+{#                                                                <div class="mb-3">#}
+{#                                                                    <form id="form-add-cart{{ item.id }}" action="{{ url('shop_cart_add') }}" method="post">#}
+{#                                                                        <input type="hidden" name="item_id" value="{{ item.id }}">#}
+{#                                                                        <label class="form-label" for="quantity">Quantity</label>#}
+{#                                                                        <input type="number" class="form-control" name="quantity" id="quantity" value="1" min="1" placeholder="Enter quantity">#}
+{#                                                                    </form>#}
+{#                                                                </div>#}
+{#                                                            </div><!--end col-->#}
+{#                                                        </div><!--end row-->#}
+{#                                                    </div><!--end modal-body-->#}
+{#                                                    <div class="modal-footer">#}
+{#                                                        <button type="button" class="btn btn-soft-secondary btn-sm" data-bs-dismiss="modal">Close</button>#}
+{#                                                        <button type="submit" class="btn btn-soft-primary btn-sm" onclick="document.getElementById('form-add-cart{{ item.id }}').submit();">Add to cart</button>#}
+{#                                                    </div><!--end modal-footer-->#}
+{#                                                </div><!--end modal-content-->#}
+{#                                            </div><!--end modal-dialog-->#}
+{#                                        </div><!--end modal-->#}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            {% endif %}
+
+                            </tbody>
+
+                            <tfoot>
+                            <tr>
+                                <th></th>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Action</th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- end col -->
+    </div> <!-- end row -->
+
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "_layouts/admin/main.html.twig" %}
+
+{% block title %}
+    Items {{ parent() }}
+{% endblock %}
+
+{% block main %}
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <div>
+                        <h4 class="card-title">Create new item <span class="badge bg-soft-success font-12">New</span></h4>
+                        <p class="text-muted mb-0">i. Enter information to add new item</p>
+                    </div>
+                    <div class="button-items">
+                        <a href="{{ url('admin_item_list') }}" type="button" class="btn btn-outline-primary">Back to list</a>
+                    </div>
+                </div><!--end card-header-->
+                <div class="card-body">
+                    {{ form(form) }}
+                </div><!--end card-body-->
+            </div><!--end card-->
+        </div><!--end col-->
+    </div>
+{% endblock %}

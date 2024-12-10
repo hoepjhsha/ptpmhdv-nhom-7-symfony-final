@@ -1,0 +1,58 @@
+{% extends "_layouts/admin/main.html.twig" %}
+
+{% block title %}
+    Dashboard
+{% endblock %}
+
+{% block main %}
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">Revenue Chart - Datetime X-Axis</h4>
+                </div><!--end card-header-->
+                <div class="card-body">
+                    <div class="chart-demo">
+                        <div id="apex_area2aaaa" class="apex-charts"></div>
+                    </div>
+                </div><!--end card-body-->
+            </div><!--end card-->
+        </div><!--end col-->
+    </div><!--end row-->
+
+    <script src="https://cdn.jsdelivr.net/npm/apexcharts"></script>
+    <script>
+        var chartData = {{ chartData|raw }}; // Dữ liệu từ controller
+
+        var options = {
+            chart: {
+                height: 350,
+                type: 'area',
+                zoom: {
+                    enabled: false
+                },
+            },
+            dataLabels: {
+                enabled: false
+            },
+            stroke: {
+                curve: 'smooth'
+            },
+            series: [{
+                name: 'Order Value',
+                data: chartData.map(function (entry) { return entry.value; }) // Lấy giá trị từ dữ liệu
+            }],
+            xaxis: {
+                categories: chartData.map(function (entry) { return entry.date; }), // Lấy ngày từ dữ liệu
+                type: 'datetime'
+            },
+            title: {
+                text: 'Order History',
+                align: 'left'
+            }
+        };
+
+        var chart = new ApexCharts(document.querySelector("#apex_area2aaaa"), options);
+        chart.render();
+    </script>
+{% endblock %}

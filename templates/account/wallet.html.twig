@@ -1,0 +1,51 @@
+{% extends "_layouts/shop/main.html.twig" %}
+
+{% block main %}
+    <div class="row">
+        <div class="col-6">
+            <div class="card">
+                <div class="card-header">
+                    <h4 class="card-title">My wallet: {{ app.user.username }}</h4>
+                </div><!--end card-header-->
+                <div class="card-body">
+                    <div class="d-flex align-items-center justify-content-between">
+                        <div>
+                            Currency: <span>{{ wallet.currency }}</span>
+                        </div>
+
+                        <div class="button-items">
+                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#exampleModalCenter">Deposit money</button>
+
+                            <div class="modal fade" id="exampleModalCenter" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h6 class="modal-title m-0" id="exampleModalCenterTitle">Input money</h6>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div><!--end modal-header-->
+                                        <form id="form-add-money" action="{{ url('account_wallet_deposit') }}" method="post">
+                                            <div class="modal-body">
+                                                <div class="row">
+                                                    <div class="col-lg-9">
+                                                        <div class="mb-3">
+                                                            <label class="form-label" for="quantity">Money</label>
+                                                            <input type="number" class="form-control" name="_money" id="quantity" value="0" min="1" placeholder="Enter quantity">
+                                                        </div>
+                                                    </div><!--end col-->
+                                                </div><!--end row-->
+                                            </div><!--end modal-body-->
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-soft-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                                                <button type="submit" class="btn btn-soft-primary btn-sm">Deposit</button>
+                                            </div><!--end modal-footer-->
+                                        </form>
+                                    </div><!--end modal-content-->
+                                </div><!--end modal-dialog-->
+                            </div><!--end modal-->
+                        </div>
+                    </div>
+                </div><!--end card-body-->
+            </div><!--end card-->
+        </div>
+    </div>
+{% endblock %}

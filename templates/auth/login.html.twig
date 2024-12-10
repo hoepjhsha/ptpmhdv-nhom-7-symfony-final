@@ -1,0 +1,77 @@
+{% extends "_layouts/auth/main.html.twig" %}
+
+{% block title %}Log in{% endblock %}
+
+{% block header_title %}Sign in{% endblock %}
+
+{% block main %}
+
+    <!-- Tab panes -->
+    <div class="tab-content">
+        <div class="tab-pane active p-3" id="LogIn_Tab" role="tabpanel">
+            <form class="form-horizontal auth-form" action="{{ url('app_login') }}" method="post">
+
+                {% if error %}
+                    <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+                {% endif %}
+
+                {% if app.user %}
+                    <div class="mb-3">
+                        You are logged in as {{ app.user.userIdentifier }}, <a href="{{ path('app_logout') }}">Logout</a>
+                    </div>
+                {% endif %}
+
+                <input type="hidden" name="_csrf_token"
+                       value="{{ csrf_token('authenticate') }}"
+                >
+
+                <div class="form-group mb-2">
+                    <label class="form-label" for="username">Username</label>
+                    <div class="input-group">
+                        <input type="text" value="{{ last_username }}" class="form-control" name="_username" id="username" placeholder="Enter username" autocomplete="username" required autofocus>
+                    </div>
+                </div><!--end form-group-->
+
+                <div class="form-group mb-2">
+                    <label class="form-label" for="password">Password</label>
+                    <div class="input-group d-flex align-items-center">
+                        <input type="password" class="form-control" name="_password" id="password" placeholder="Enter password" autocomplete="current-password" required>
+                        <i class="fa fa-eye-slash" id="togglePassword" style="cursor: pointer; margin-left: -25px; padding-right: 10px; z-index: 100;"></i>
+                        <script>
+                            const togglePassword = document
+                                .querySelector('#togglePassword');
+                            const password = document.querySelector('#password');
+                            togglePassword.addEventListener('click', () => {
+                                const type = password
+                                    .getAttribute('type') === 'password' ?
+                                    'text' : 'password';
+                                password.setAttribute('type', type);
+
+                                this.toggle('fa-eye');
+                            });
+                        </script>
+                    </div>
+                </div><!--end form-group-->
+
+                <div class="form-group row my-3">
+                    <div class="col-sm-6">
+                        <div class="custom-control custom-switch switch-success">
+                            <input type="checkbox" name="_remember_me" class="custom-control-input" id="_remember_me">
+                            <label class="form-label text-muted" for="_remember_me">Remember me</label>
+                        </div>
+                    </div><!--end col-->
+                </div><!--end form-group-->
+
+                <div class="form-group mb-0 row">
+                    <div class="col-12">
+                        <button class="btn btn-primary w-100 waves-effect waves-light" type="submit">Log In <i class="fas fa-sign-in-alt ms-1"></i></button>
+                    </div><!--end col-->
+                </div> <!--end form-group-->
+            </form><!--end form-->
+            <div class="m-3 text-center text-muted">
+                <p class="mb-0">Don't have an account ?  <a href="#" class="text-primary ms-2">Free Resister</a></p>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}

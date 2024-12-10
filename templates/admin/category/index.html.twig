@@ -1,0 +1,136 @@
+{% extends "_layouts/admin/main.html.twig" %}
+
+{% block title %}
+    Categories {{ parent() }}
+{% endblock %}
+
+{% block stylesheets %}
+    <!-- DataTables -->
+    <link href="{{ asset('plugins/datatables/dataTables.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('plugins/datatables/buttons.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
+
+    <!-- App css -->
+    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/icons.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/metisMenu.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('plugins/daterangepicker/daterangepicker.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/app.min.css') }}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block javascripts %}
+    <!-- jQuery  -->
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
+    <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('js/metismenu.min.js') }}"></script>
+    <script src="{{ asset('js/waves.js') }}"></script>
+    <script src="{{ asset('js/feather.min.js') }}"></script>
+    <script src="{{ asset('js/simplebar.min.js') }}"></script>
+    <script src="{{ asset('js/moment.js') }}"></script>
+    <script src="{{ asset('plugins/daterangepicker/daterangepicker.js') }}"></script>
+
+    <!-- Required datatable js -->
+    <script src="{{ asset('plugins/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('plugins/datatables/dataTables.bootstrap5.min.js') }}"></script>
+
+    <!-- App js -->
+    <script src="{{ asset('js/app.js') }}"></script>
+    <script>
+        $('#datatable').DataTable();
+    </script>
+
+    {% include "_widgets/sweetalert2.html.twig" %}
+{% endblock %}
+
+{% block main %}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h4 class="card-title">Default Datatable</h4>
+                    <div class="button-items">
+                        <a href="{{ url('admin_category_create') }}" type="button" class="btn btn-outline-primary">Add a new category</a>
+                    </div>
+                </div><!--end card-header-->
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="datatable" class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th></th>
+                                <th>Category Name</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+
+                            {% for category in categories %}
+                                <tr>
+                                    <td> {{ category.id }}</td>
+                                    <td class="d-flex align-items-center">
+                                        <p class="d-inline-block align-middle mb-0">
+                                            <a href="{{ category.action.view }}" class="d-inline-block align-middle mb-0 product-name" style="white-space: normal; word-wrap: break-word; margin: 5px">{{ category.name }}</a>
+                                            <br>
+                                        </p>
+                                    </td>
+                                    <td>
+                                        <a href="{{ category.action.update }}"><i class="las la-pen text-secondary font-16"></i></a>
+                                        <a onclick="confirmDelete{{ category.id }}()" style="cursor: pointer;"><i class="las la-trash-alt text-secondary font-16"></i></a>
+
+                                        <form id="delete-form-{{ category.id }}" method="post" action="{{ url('admin_category_delete', {id: category.id}) }}">
+                                            <input type="hidden" name="_delete_id" value="{{ category.id }}">
+                                        </form>
+                                        <script>
+                                            function confirmDelete{{ category.id }}() {
+                                                const swalWithBootstrapButtons = Swal.mixin({
+                                                    customClass: {
+                                                        confirmButton: 'btn btn-primary mr-10 me-1',
+                                                        cancelButton: 'btn btn-danger mr-10 me-1'
+                                                    },
+                                                    buttonsStyling: false
+                                                });
+                                                swalWithBootstrapButtons.fire({
+                                                    title: "Are you sure you want to delete?",
+                                                    text: "This action can not be reverted!",
+                                                    icon: "warning",
+                                                    showCancelButton: true,
+                                                    confirmButtonText: "Yes, delete it!",
+                                                    cancelButtonText: "No, cancel!",
+                                                    reverseButtons: true
+                                                }).then((result) => {
+                                                    if (result.isConfirmed) {
+                                                        document.getElementById('delete-form-{{ category.id }}').submit();
+                                                    } else if (
+                                                        result.dismiss === Swal.DismissReason.cancel
+                                                    ) {
+                                                        swalWithBootstrapButtons.fire({
+                                                            title: "Cancelled",
+                                                            text: "This action has been cancelled :)",
+                                                            icon: "error"
+                                                        });
+                                                    }
+                                                });
+                                            }
+                                        </script>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+
+                            </tbody>
+
+                            <tfoot>
+                            <tr>
+                                <th></th>
+                                <th>Category Name</th>
+                                <th>Action</th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- end col -->
+    </div> <!-- end row -->
+
+{% endblock %}

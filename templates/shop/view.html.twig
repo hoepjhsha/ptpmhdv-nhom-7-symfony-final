@@ -1,0 +1,58 @@
+{% extends "_layouts/shop/main.html.twig" %}
+
+{% block main %}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h4 class="card-title">Product detail: {{ item.name }}</h4>
+                    <div class="button-items">
+                        <a href="{{ url('shop_list') }}" type="button" class="btn btn-outline-primary">Back to list</a>
+                    </div>
+                </div><!--end card-header-->
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-lg-6 align-self-center">
+                            <img src="{{ item.image }}" alt="" class=" mx-auto  d-block" height="200" width="200">
+                        </div><!--end col-->
+                        <div class="col-lg-6 align-self-center">
+                            <div class="single-pro-detail">
+                                <p class="mb-1">Dastone</p>
+                                <div class="custom-border mb-3"></div>
+                                <h3 class="pro-title">{{ item.name }}</h3>
+                                <p class="text-muted mb-0">{{ item.category }}</p>
+                                <h2 class="pro-price">Giá: {{ item.price | number_format(0, ',', '.') }} VND</h2>
+                                <div class="quantity mt-3 ">
+                                    <form action="{{ url('shop_cart_add') }}" method="post">
+                                        <input type="hidden" name="item_id" value="{{ item.id }}">
+                                        <input class="form-control form-control-sm" type="number" name="quantity" min="1" value="1" id="example-number-input">
+                                        <button type="submit" class="btn btn-primary btn-sm text-white px-4 d-inline-block"><i class="mdi mdi-cart me-2"></i>Add to Cart</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div><!--end col-->
+                    </div><!--end row-->
+                </div><!--end card-body-->
+            </div><!--end card-->
+        </div><!--end col-->
+    </div><!--end row-->
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card" style="width: 100%">
+                <div class="card-header">
+                    <h4 class="card-title">Description:</h4>
+                </div>
+                <div class="card-body" style="width: 100%">
+                    <p class="pro-features border-0" style="white-space: pre-wrap;
+                    word-wrap: break-word;
+                    width: 100%;
+                    overflow-wrap: break-word;
+                    max-width: 100%;">{{ item.description }}</p>
+                </div><!--end card-body-->
+            </div><!--end card-->
+        </div><!--end col-->
+    </div><!--end row-->
+
+{% endblock %}
