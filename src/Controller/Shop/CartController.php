@@ -162,12 +162,6 @@ class CartController extends BaseController
         $order = $this->orderRepository->getOrCreateOrderForUser($user);
         $orderItems = $order->getOrderItems();
 
-        if ($orderItems->isEmpty()) {
-            $this->addFlash('error', 'Your cart is empty. Cannot proceed to checkout.');
-
-            return $this->redirectToRoute('shop_cart');
-        }
-
         $order = $this->orderRepository->findOneBy(['user' => $user]);
         if (!$order) {
             $this->addFlash('error', 'Your cart is empty.');

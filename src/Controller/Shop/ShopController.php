@@ -96,6 +96,12 @@ class ShopController extends BaseController
         $order = $this->orderRepository->getOrCreateOrderForUser($user);
         $orderItems = $order->getOrderItems();
 
+        if ($orderItems->isEmpty()) {
+            $this->addFlash('error', 'Your cart is empty. Cannot proceed to checkout.');
+
+            return $this->redirectToRoute('shop_cart');
+        }
+
         $data = [];
         foreach ($orderItems as $orderItem) {
             $data[] = $orderItem;
