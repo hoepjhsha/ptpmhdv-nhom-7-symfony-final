@@ -14,6 +14,10 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class AppFixtures extends Fixture
 {
+    /**
+     * @throws DateMalformedStringException
+     * @throws DateInvalidOperationException
+     */
     public function load(ObjectManager $manager): void
     {
         $filePath = __DIR__ . '/../../data/UV_Product2.xlsx';
@@ -108,7 +112,7 @@ class AppFixtures extends Fixture
         $manager->persist($user);
         $manager->persist($user2);
 
-        for ($i = 0; $i < 15; $i++) {
+        for ($i = 0; $i < 20; $i++) {
             $orderHistory = new OrderHistory();
 
             $orderHistory->setUser($user2);
@@ -117,6 +121,7 @@ class AppFixtures extends Fixture
 
             $orderHistory->setTotalPrice(number_format($totalPrice, 2, '.', ''));
             $createdAt = $this->getRandomDateWithinLast3Months();
+            $orderHistory->setStatus(mt_rand(0, 3));
             $orderHistory->setCreatedAt($createdAt);
             $orderHistory->setOrderItems(['item1', 'item2', 'item3']);
 

@@ -151,7 +151,6 @@ class CartController extends BaseController
         ]);
     }
 
-    #[Route('/cart/handle-checkout', name: 'cart_checkout', methods: ['GET', 'POST'])]
     public function checkout(Request $request): Response
     {
         $user = $this->security->getUser();

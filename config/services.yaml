@@ -20,5 +20,11 @@ services:
             - '../src/Entity/'
             - '../src/Kernel.php'
 
+    App\Services\VNPayService:
+        arguments:
+            $vnp_TmnCode: '%env(VNP_TMNCODE)%'
+            $vnp_HashSecret: '%env(VNP_HASHSECRET)%'
+            $vnp_Url: '%env(VNP_URL)%'
+            $vnp_Returnurl: '%env(VNP_RETURNURL)%'
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
