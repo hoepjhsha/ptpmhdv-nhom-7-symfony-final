@@ -20,11 +20,12 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('ROLE_ADMIN')]
 class DashboardController extends BaseController
 {
-    #[Route(path: '/', name: 'dashboard')]
+    #[Route(path: '', name: 'dashboard')]
     public function index(EntityManagerInterface $em): Response
     {
         $orderHistories = $em->getRepository(OrderHistory::class)
             ->createQueryBuilder('o')
+            ->where('o.status = 2')
             ->orderBy('o.created_at', 'ASC')
             ->getQuery()
             ->getResult();

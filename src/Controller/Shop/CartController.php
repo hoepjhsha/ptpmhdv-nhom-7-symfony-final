@@ -12,7 +12,6 @@ namespace App\Controller\Shop;
 use App\Controller\BaseController;
 use App\Entity\Item;
 use App\Entity\Order;
-use App\Entity\OrderHistory;
 use App\Entity\OrderItem;
 use App\Entity\User;
 use App\Repository\OrderItemRepository;
@@ -149,66 +148,6 @@ class CartController extends BaseController
             'orderItems' => $data,
             'totalMoney' => $totalMoney,
         ]);
-    }
-
-    #[Route('/cart/handle-checkout', name: 'cart_checkout', methods: ['GET', 'POST'])]
-    public function checkout(Request $request): Response
-    {
-        $user = $this->security->getUser();
-        if (!$user instanceof User) {
-            return $this->redirectToRoute('app_login');
-        }
-
-        $order = $this->orderRepository->getOrCreateOrderForUser($user);
-        $orderItems = $order->getOrderItems();
-
-        $order = $this->orderRepository->findOneBy(['user' => $user]);
-        if (!$order) {
-            $this->addFlash('error', 'Your cart is empty.');
-            return $this->redirectToRoute('shop_cart');
-        }
-
-        $totalPrice = 0;
-        $orderItems = $order->getOrderItems();
-        $itemsSummary = [];
-        foreach ($orderItems as $orderItem) {
-            $item = $orderItem->getItem();
-            $quantity = $orderItem->getQuantity();
-            $price = $item->getItemPrice();
-            $totalPrice += $price * $quantity;
-
-            $itemsSummary[] = [
-                'item_name' => $item->getItemName(),
-                'quantity' => $quantity,
-                'price' => $price,
-            ];
-        }
-
-        if ($user->getWallet()->getCurrency() >= $totalPrice) {
-            $user->getWallet()->setCurrency($user->getWallet()->getCurrency() - $totalPrice);
-        } else {
-            $this->addFlash('error', 'Not enough money in your wallet to checkout.');
-            return $this->redirectToRoute('shop_cart');
-        }
-
-        $orderHistory = new OrderHistory();
-        $orderHistory->setUser($user);
-        $orderHistory->setOrderItems($itemsSummary);
-        $orderHistory->setTotalPrice($totalPrice);
-        $orderHistory->setCreatedAt(new \DateTime());
-
-        $this->em->persist($orderHistory);
-
-        foreach ($orderItems as $orderItem) {
-            $this->em->remove($orderItem);
-        }
-
-        $this->em->persist($order);
-
-        $this->em->flush();
-
-        $this->addFlash('success', 'Checkout successful! Your order has been placed.');
-        return $this->redirectToRoute('shop_cart');
     }
 
     private function getOrder(): Order|Response

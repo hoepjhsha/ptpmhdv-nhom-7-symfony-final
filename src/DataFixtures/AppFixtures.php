@@ -5,15 +5,22 @@ namespace App\DataFixtures;
 use App\Entity\Category;
 use App\Entity\Item;
 use App\Entity\OrderHistory;
+use App\Entity\Transaction;
 use App\Entity\User;
 use DateInvalidOperationException;
 use DateMalformedStringException;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use Random\RandomException;
 
 class AppFixtures extends Fixture
 {
+    /**
+     * @throws DateMalformedStringException
+     * @throws DateInvalidOperationException
+     * @throws RandomException
+     */
     public function load(ObjectManager $manager): void
     {
         $filePath = __DIR__ . '/../../data/UV_Product2.xlsx';
@@ -108,7 +115,7 @@ class AppFixtures extends Fixture
         $manager->persist($user);
         $manager->persist($user2);
 
-        for ($i = 0; $i < 15; $i++) {
+        for ($i = 0; $i < 20; $i++) {
             $orderHistory = new OrderHistory();
 
             $orderHistory->setUser($user2);
@@ -117,8 +124,41 @@ class AppFixtures extends Fixture
 
             $orderHistory->setTotalPrice(number_format($totalPrice, 2, '.', ''));
             $createdAt = $this->getRandomDateWithinLast3Months();
+            $orderHistory->setStatus(2);
+            $orderHistory->setPaymentType(mt_rand(0, 1));
             $orderHistory->setCreatedAt($createdAt);
             $orderHistory->setOrderItems(['item1', 'item2', 'item3']);
+
+            $amount = mt_rand(100000, 50000000);
+            $bankCode = 'TEMP';
+            $bankTranNo = 'VNP' . mt_rand(10000000, 99999999);
+            $cardType = ['ATM', 'Credit', 'Debit'][array_rand(['ATM', 'Credit', 'Debit'])];
+            $orderInfo = 'Thanh toan GD:' . mt_rand(1000, 9999);
+            $payDate = (new \DateTime())->format('YmdHis');
+            $responseCode = ['00', '01', '02'][array_rand(['00', '01', '02'])];
+            $tmnCode = 'NED' . mt_rand(1000, 9999);
+            $transactionNo = (string)mt_rand(10000000, 99999999);
+            $transactionStatus = ['00', '01', '02'][array_rand(['00', '01', '02'])];
+            $txnRef = (string)mt_rand(1000, 9999);
+            $secureHash = hash('sha256', $amount . $bankTranNo . $txnRef . random_bytes(16));
+
+            $transaction = new Transaction();
+            $transaction->setAmount((string)$amount);
+            $transaction->setBankCode($bankCode);
+            $transaction->setBankTranNo($bankTranNo);
+            $transaction->setCardType($cardType);
+            $transaction->setOrderInfo($orderInfo);
+            $transaction->setPayDate($payDate);
+            $transaction->setResponseCode($responseCode);
+            $transaction->setTmnCode($tmnCode);
+            $transaction->setTransactionNo($transactionNo);
+            $transaction->setTransactionStatus($transactionStatus);
+            $transaction->setTxnRef($txnRef);
+            $transaction->setSecureHash($secureHash);
+
+            $manager->persist($transaction);
+
+            $orderHistory->setTransact($transaction);
 
             $manager->persist($orderHistory);
         }

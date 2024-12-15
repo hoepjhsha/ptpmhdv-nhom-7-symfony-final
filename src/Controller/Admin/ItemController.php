@@ -57,8 +57,6 @@ class ItemController extends BaseController
 
         if (is_null($items)) {
             $this->addFlash('error', 'Items not found');
-
-//            return $this->redirectToRoute('admin_dashboard');
         }
 
         return $this->render('admin/item/index.html.twig', [

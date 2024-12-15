@@ -19,18 +19,40 @@ class OrderHistory
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private ?User $user = null;
 
+    #[ORM\Column]
+    private array $order_items = [];
+
+    /**
+     * Define status of order: 0 - Pending, 1 - Processing, 2 - Completed, 3 - Cancelled
+     *
+     * @var int|null
+     */
+    #[ORM\Column(type: Types::SMALLINT)]
+    private ?int $status = null;
+
     #[ORM\Column(type: Types::DECIMAL, precision: 65, scale: 2)]
     private ?string $total_price = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
 
-    #[ORM\Column]
-    private array $order_items = [];
 
-    #[ORM\ManyToOne(inversedBy: 'orderHistories')]
-    #[ORM\JoinColumn(nullable: true)]
-    private ?Address $address = null;
+    /**
+     * Define payment type of order: 0 - Cash, 1 - VNPay
+     *
+     * @var int|null
+     */
+    #[ORM\Column(type: Types::SMALLINT)]
+    private ?int $payment_type = null;
+
+    #[ORM\OneToOne(targetEntity: Transaction::class, inversedBy: 'orderHistory', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(name: 'transact_id', referencedColumnName: 'id', nullable: true, onDelete: 'CASCADE')]
+    private ?Transaction $transact = null;
+
+    public function __construct()
+    {
+        $this->status = 0;
+    }
 
     public function getId(): ?int
     {
@@ -92,14 +114,38 @@ class OrderHistory
         return $this;
     }
 
-    public function getAddress(): ?Address
+    public function getStatus(): ?int
     {
-        return $this->address;
+        return $this->status;
     }
 
-    public function setAddress(?Address $address): static
+    public function setStatus(int $status): static
     {
-        $this->address = $address;
+        $this->status = $status;
+
+        return $this;
+    }
+
+    public function getPaymentType(): ?int
+    {
+        return $this->payment_type;
+    }
+
+    public function setPaymentType(int $payment_type): static
+    {
+        $this->payment_type = $payment_type;
+
+        return $this;
+    }
+
+    public function getTransact(): ?Transaction
+    {
+        return $this->transact;
+    }
+
+    public function setTransact(?Transaction $transact): static
+    {
+        $this->transact = $transact;
 
         return $this;
     }

@@ -1,0 +1,85 @@
+{% extends "_layouts/shop/main.html.twig" %}
+
+{% block stylesheets %}
+    <!-- DataTables -->
+    <link href="{{ asset('plugins/datatables/dataTables.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('plugins/datatables/buttons.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
+
+    {{ parent() }}
+{% endblock %}
+
+{% block js %}
+    <!-- Required datatable js -->
+    <script src="{{ asset('plugins/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('plugins/datatables/dataTables.bootstrap5.min.js') }}"></script>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+
+    <script>
+        $('#datatable').DataTable();
+    </script>
+{% endblock %}
+
+{% block main %}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h4 class="card-title">Default Datatable</h4>
+                </div><!--end card-header-->
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="datatable" class="table table-bordered">
+                            <thead>
+                            <tr>
+                                <th></th>
+                                <th>Items</th>
+                                <th>Total price</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                            </thead>
+
+                            <tbody>
+
+                                {% if orderItems is not null %}
+                                {% for orderItem in orderItems %}
+                                    <tr>
+                                        <td>{{ loop.index }}</td>
+                                        <td>
+                                            {% for order in orderItem.order_items %}
+                                                {{ order is iterable ? order.item_name : order }},
+                                            {% endfor %}
+                                        </td>
+                                        <td align="right">{{ orderItem.total_price | number_format(0, ',', '.') }} VND</td>
+                                        <td>{{ orderItem.status }}</td>
+                                        <td>
+                                            <a class="fa fa-undo me-2" href="{{ orderItem.action.refund }}" style="cursor:pointer;"></a>
+                                            <a class="fa fa-times" href="{{ orderItem.action.cancel }}" style="cursor:pointer;"></a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                {% endif %}
+
+                            </tbody>
+
+                            <tfoot>
+                            <tr>
+                                <th></th>
+                                <th>Items</th>
+                                <th>Total price</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- end col -->
+    </div> <!-- end row -->
+
+{% endblock %}
