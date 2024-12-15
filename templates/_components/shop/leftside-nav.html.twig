@@ -21,7 +21,13 @@
                 <ul class="nav-second-level" aria-expanded="false">
                     <li class="nav-item"><a class="nav-link" href="{{ url('shop_list') }}"><i class="ti-control-record"></i>Product List</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url('shop_cart') }}"><i class="ti-control-record"></i>Cart</a></li>
-                    <li class="nav-item"><a class="nav-link" href="{{ url('account_wallet') }}"><i class="ti-control-record"></i>My Wallet</a></li>
+                    <li>
+                        <a href="javascript: void(0);"><i class="ti-control-record"></i>Profile<span class="menu-arrow left-has-menu"><i class="mdi mdi-chevron-right"></i></span></a>
+                        <ul class="nav-second-level" aria-expanded="false">
+                            <li><a href="{{ url('account_wallet') }}">My Wallet</a></li>
+                            <li><a href="{{ url('account_order') }}">My Orders</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </li>
         </ul>

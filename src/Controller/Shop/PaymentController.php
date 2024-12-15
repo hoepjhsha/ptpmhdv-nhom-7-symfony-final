@@ -11,6 +11,7 @@ namespace App\Controller\Shop;
 
 use App\Controller\BaseController;
 use App\Entity\OrderHistory;
+use App\Entity\Transaction;
 use App\Entity\User;
 use App\Repository\OrderRepository;
 use App\Services\VNPayService;
@@ -110,7 +111,25 @@ class PaymentController extends BaseController
                 $orderHistory->setUser($user);
                 $orderHistory->setOrderItems($itemsSummary);
                 $orderHistory->setTotalPrice($totalPrice);
+                $orderHistory->setPaymentType(1);
                 $orderHistory->setCreatedAt(new \DateTime());
+
+                $transaction = new Transaction();
+                $transaction->setAmount($data['vnp_Amount']);
+                $transaction->setBankCode($data['vnp_BankCode']);
+                $transaction->setBankTranNo($data['vnp_BankTranNo']);
+                $transaction->setCardType($data['vnp_CardType']);
+                $transaction->setOrderInfo($data['vnp_OrderInfo']);
+                $transaction->setPayDate($data['vnp_PayDate']);
+                $transaction->setResponseCode($data['vnp_ResponseCode']);
+                $transaction->setTmnCode($data['vnp_TmnCode']);
+                $transaction->setTransactionNo($data['vnp_TransactionNo']);
+                $transaction->setTransactionStatus($data['vnp_TransactionStatus']);
+                $transaction->setTxnRef($data['vnp_TxnRef']);
+                $transaction->setSecureHash($vnpSecureHash);
+
+                $this->em->persist($transaction);
+                $orderHistory->setTransact($transaction);
 
                 $this->em->persist($orderHistory);
 

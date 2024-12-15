@@ -104,6 +104,7 @@ class CategoryController extends BaseController
 
             if ($form->isSubmitted() && $form->isValid()) {
                 try {
+                    $task->setId($this->em->getRepository(Category::class)->findBy([], ['id' => 'DESC'])[0]->getId() + 1);
                     $this->em->persist($task);
                     $this->em->flush();
 

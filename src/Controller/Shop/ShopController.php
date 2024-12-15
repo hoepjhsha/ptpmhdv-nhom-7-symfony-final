@@ -37,7 +37,7 @@ class ShopController extends BaseController
         $this->em = $em;
     }
 
-    #[Route(path: '/', name: 'list', methods: ['GET'])]
+    #[Route(path: '', name: 'list', methods: ['GET'])]
     public function index(): Response
     {
         $user = $this->security->getUser();
