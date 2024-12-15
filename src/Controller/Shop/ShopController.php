@@ -12,7 +12,6 @@ namespace App\Controller\Shop;
 use App\Controller\BaseController;
 use App\Entity\User;
 use App\Entity\Wallet;
-use App\Repository\OrderItemRepository;
 use App\Repository\OrderRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -26,13 +25,11 @@ class ShopController extends BaseController
 {
     private EntityManagerInterface $em;
     private OrderRepository $orderRepository;
-    private OrderItemRepository $orderItemRepository;
     private Security $security;
 
-    public function __construct(OrderRepository $orderRepository, OrderItemRepository $orderItemRepository, Security $security, EntityManagerInterface $em)
+    public function __construct(OrderRepository $orderRepository, Security $security, EntityManagerInterface $em)
     {
         $this->orderRepository = $orderRepository;
-        $this->orderItemRepository = $orderItemRepository;
         $this->security = $security;
         $this->em = $em;
     }
