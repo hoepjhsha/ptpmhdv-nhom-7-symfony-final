@@ -15,6 +15,7 @@ use App\Entity\Payment;
 use App\Entity\Transaction;
 use App\Entity\User;
 use App\Repository\CartRepository;
+use App\Services\SpayLaterService;
 use App\Services\VNPayService;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
@@ -27,13 +28,15 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class PaymentController extends BaseController
 {
     private VNPayService $vnpService;
+    private SpayLaterService $spayLaterService;
     private Security $security;
     private EntityManagerInterface $em;
     private CartRepository $cartRepository;
 
-    public function __construct(VNPayService $vnpService, Security $security, EntityManagerInterface $em, CartRepository $cartRepository)
+    public function __construct(VNPayService $vnpService, SpayLaterService $spayLaterService, Security $security, EntityManagerInterface $em, CartRepository $cartRepository)
     {
         $this->vnpService = $vnpService;
+        $this->spayLaterService = $spayLaterService;
         $this->security = $security;
         $this->em = $em;
         $this->cartRepository = $cartRepository;
@@ -161,6 +164,67 @@ class PaymentController extends BaseController
         } else {
             $this->addFlash('error', 'Invalid signature');
         }
+
+        return $this->redirectToRoute('shop_cart');
+    }
+
+    #[Route(path: 'installment/create', name: 'installment_create', methods: ['POST'])]
+    public function createInstallments(Request $request) {
+        $amount = $request->request->get('amount');
+        $installmentCount = $request->request->get('installmentCount');
+
+        $user = $this->security->getUser();
+        if (!$user instanceof User) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $cart = $this->cartRepository->getOrCreateCartForUser($user);
+
+        $cart = $this->cartRepository->findOneBy(['user' => $user]);
+        if (!$cart) {
+            $this->addFlash('error', 'Your cart is empty.');
+            return $this->redirectToRoute('shop_cart');
+        }
+
+        $totalPrice = 0;
+        $cartItems = $cart->getCartItems();
+        $itemsSummary = [];
+
+        foreach ($cartItems as $cartItem) {
+            $item = $cartItem->getItem();
+            $quantity = $cartItem->getQuantity();
+            $price = $item->getItemPrice();
+            $totalPrice += $price * $quantity;
+            $itemsSummary[] = [
+                'item_name' => $item->getItemName(),
+                'quantity' => $quantity,
+                'price' => $price,
+            ];
+        }
+
+        $orderHistory = new OrderHistory();
+        $orderHistory->setUser($user);
+        $orderHistory->setOrderItems($itemsSummary);
+        $orderHistory->setTotalAmount($totalPrice);
+        $orderHistory->setCreatedAt(new \DateTime());
+
+        $payment = new Payment();
+        $payment->setOrderHistory($orderHistory);
+        $payment->setPaymentMethod(2);
+        $payment->setStatus(0);
+        $payment->setPaidAt(new \DateTime());
+
+        $this->spayLaterService->createInstallments($payment, $installmentCount);
+
+        foreach ($cartItems as $cartItem) {
+            $this->em->remove($cartItem);
+        }
+
+        $this->em->persist($cart);
+
+        $this->em->flush();
+
+        $this->addFlash('success','Create installments successfully.');
 
         return $this->redirectToRoute('shop_cart');
     }

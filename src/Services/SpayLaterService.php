@@ -41,7 +41,7 @@ class SpayLaterService
         $currentMonth = (int)$currentDate->format('m');
         $currentYear = (int)$currentDate->format('Y');
 
-        $dueDate = new \DateTime("$currentYear-$currentMonth-10");
+        $dueDate = new \DateTime("$currentYear-$currentMonth-10 23:59:59");
         if ($currentDate->format('d') >= 24) {
             $dueDate->modify('+2 month');
         } else {
@@ -57,10 +57,9 @@ class SpayLaterService
             $installment->setDueDate($dueDate);
 
             $this->em->persist($installment);
+            $this->em->flush();
 
             $dueDate->modify('+1 month');
         }
-
-        $this->em->flush();
     }
 }

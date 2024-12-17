@@ -72,6 +72,22 @@
                         <input type="hidden" name="amount" value="{{ totalMoney }}">
                         <button type="submit" class="btn w-100 btn-soft-primary">Place Your Order</button>
                     </form>
+
+                    <form action="{{ url('installment_create') }}" method="post" class="d-flex  mt-3">
+                        <input type="hidden" name="amount" value="{{ totalMoney }}">
+                        <div class="col-3">
+                            <select class="form-select" id="inlineFormSelectPref" name="installmentCount">
+                                <option value="1">One</option>
+                                <option value="2">Two</option>
+                                <option value="3">Three</option>
+                                <option value="6">Six</option>
+                                <option value="12">Twelve</option>
+                            </select>
+                        </div>
+                        <div class="col-9">
+                            <button type="submit" class="btn w-100 btn-soft-primary">Place by Spay Later</button>
+                        </div>
+                    </form>
                 </div><!--end card-body-->
             </div><!--end card-->
         </div><!--end col-->
