@@ -25,6 +25,9 @@ class Installment
     #[ORM\Column(type: Types::DECIMAL, precision: 65, scale: 2)]
     private ?string $amount = null;
 
+    #[ORM\Column(type: Types::DECIMAL, precision: 65, scale: 2)]
+    private ?string $later_fee = null;
+
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $due_date = null;
 
@@ -89,6 +92,16 @@ class Installment
         $this->amount = $amount;
 
         return $this;
+    }
+
+    public function getLaterFee(): ?string
+    {
+        return $this->later_fee;
+    }
+
+    public function setLaterFee(?string $later_fee): void
+    {
+        $this->later_fee = $later_fee;
     }
 
     public function getDueDate(): ?\DateTimeInterface
