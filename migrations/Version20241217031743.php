@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20241217015240 extends AbstractMigration
+final class Version20241217031743 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -26,7 +26,7 @@ final class Version20241217015240 extends AbstractMigration
         $this->addSql('CREATE TABLE carts (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, user INTEGER NOT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, CONSTRAINT FK_4E004AAC8D93D649 FOREIGN KEY (user) REFERENCES users (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE)');
         $this->addSql('CREATE UNIQUE INDEX UNIQ_4E004AAC8D93D649 ON carts (user)');
         $this->addSql('CREATE TABLE categories (id INTEGER NOT NULL, category_name VARCHAR(255) NOT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, PRIMARY KEY(id))');
-        $this->addSql('CREATE TABLE installments (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, payment_id INTEGER NOT NULL, installment_no INTEGER NOT NULL, amount NUMERIC(65, 2) NOT NULL, due_date DATETIME NOT NULL, paid BOOLEAN NOT NULL, late_fee NUMERIC(65, 2) NOT NULL, CONSTRAINT FK_FE90068C4C3A3BB FOREIGN KEY (payment_id) REFERENCES payments (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE)');
+        $this->addSql('CREATE TABLE installments (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, payment_id INTEGER NOT NULL, installment_no INTEGER NOT NULL, amount NUMERIC(65, 2) NOT NULL, later_fee NUMERIC(65, 2) NOT NULL, due_date DATETIME NOT NULL, paid BOOLEAN NOT NULL, late_fee NUMERIC(65, 2) NOT NULL, CONSTRAINT FK_FE90068C4C3A3BB FOREIGN KEY (payment_id) REFERENCES payments (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE)');
         $this->addSql('CREATE INDEX IDX_FE90068C4C3A3BB ON installments (payment_id)');
         $this->addSql('CREATE TABLE items (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, item_category_id INTEGER NOT NULL, item_code VARCHAR(255) NOT NULL, item_name VARCHAR(255) NOT NULL, item_price NUMERIC(65, 2) NOT NULL, item_image VARCHAR(255) DEFAULT NULL, item_description CLOB DEFAULT NULL, created_at DATETIME NOT NULL, updated_at DATETIME NOT NULL, CONSTRAINT FK_E11EE94DF22EC5D4 FOREIGN KEY (item_category_id) REFERENCES categories (id) ON DELETE CASCADE NOT DEFERRABLE INITIALLY IMMEDIATE)');
         $this->addSql('CREATE INDEX IDX_E11EE94DF22EC5D4 ON items (item_category_id)');

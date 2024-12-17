@@ -74,31 +74,6 @@
                                         <td class="payment-title">Subtotal</td>
                                         <td>{{ totalMoney | number_format(0, ',', '.') }} VND</td>
                                     </tr>
-
-                                    <tr>
-                                        <td class="payment-title">Shipping</td>
-                                        <td>
-                                            <ul class="list-unstyled mb-0">
-                                                <li>
-                                                    <div class="radio radio-primary">
-                                                        <input type="radio" name="radio" id="radio_1" value="option_1" checked>
-                                                        <label for="radio_1">
-                                                            Shipping Charge : {{ shipping_charge.standard | number_format(0, '.', ',') }} VND
-                                                        </label>
-                                                    </div>
-                                                </li>
-                                                <li>
-                                                    <div class="radio radio-primary">
-                                                        <input type="radio" name="radio" id="radio_2" value="option_2">
-                                                        <label for="radio_2">
-                                                            Express Shipping Charge : {{ shipping_charge.express | number_format(0, '.', ',') }} VND
-                                                        </label>
-                                                    </div>
-                                                </li>
-                                            </ul>
-                                        </td>
-                                    </tr>
-
                                     <tr>
                                         <td class="payment-title">Total</td>
                                         <td class="text-dark"><strong>{{ totalMoney | number_format(0, ',', '.') }} VND</strong></td>

@@ -26,5 +26,12 @@ services:
             $vnp_HashSecret: '%env(VNP_HASHSECRET)%'
             $vnp_Url: '%env(VNP_URL)%'
             $vnp_Returnurl: '%env(VNP_RETURNURL)%'
+
+    App\Services\SpayLaterService:
+        arguments:
+            $em: '@Doctrine\ORM\EntityManagerInterface'
+            $vnpService: '@App\Services\VNPayService'
+            $SPayLater_installment_conversion_fee: '%env(SPayLater_installment_conversion_fee)%'
+            $SpayLater_late_fee: '%env(SpayLater_late_fee)%'
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones

@@ -43,7 +43,7 @@ class Installment
     public function __construct()
     {
         $this->paid = false;
-        $late_fee = '0.00';
+        $this->late_fee = '0.00';
     }
 
     public function getId(): ?int
