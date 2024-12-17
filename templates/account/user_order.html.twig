@@ -37,7 +37,7 @@
                             <tr>
                                 <th></th>
                                 <th>Items</th>
-                                <th>Total price</th>
+                                <th>Total amount</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>
@@ -54,7 +54,7 @@
                                                 {{ order is iterable ? order.item_name : order }},
                                             {% endfor %}
                                         </td>
-                                        <td align="right">{{ orderItem.total_price | number_format(0, ',', '.') }} VND</td>
+                                        <td align="right">{{ orderItem.total_amount | number_format(0, ',', '.') }} VND</td>
                                         <td>{{ orderItem.status }}</td>
                                         <td>
                                             <a class="fa fa-undo me-2" href="{{ orderItem.action.refund }}" style="cursor:pointer;"></a>
@@ -70,7 +70,7 @@
                             <tr>
                                 <th></th>
                                 <th>Items</th>
-                                <th>Total price</th>
+                                <th>Total amount</th>
                                 <th>Status</th>
                                 <th>Action</th>
                             </tr>

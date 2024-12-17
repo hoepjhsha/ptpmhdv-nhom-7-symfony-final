@@ -18,19 +18,19 @@
                             </tr>
                             </thead>
                             <tbody>
-                            {% if orderItems is not null %}
-                                {% for orderItem in orderItems %}
+                            {% if cartItems is not null %}
+                                {% for cartItem in cartItems %}
                                     <tr>
                                         <td>
                                             <p class="d-inline-block align-middle mb-0">
-                                                <a href="{{ url('shop_view', {id: orderItem.item.id}) }}" class="d-inline-block align-middle mb-0 product-name">{{ orderItem.item.itemName }}</a>
+                                                <a href="{{ url('shop_view', {id: cartItem.item.id}) }}" class="d-inline-block align-middle mb-0 product-name">{{ cartItem.item.itemName }}</a>
                                                 <br>
                                             </p>
                                         </td>
                                         <td>
-                                            {{ orderItem.quantity }}
+                                            {{ cartItem.quantity }}
                                         </td>
-                                        <td>{{ (orderItem.item.itemPrice * orderItem.quantity) | number_format(0, ',', '.') }} VND</td>
+                                        <td>{{ (cartItem.item.itemPrice * cartItem.quantity) | number_format(0, ',', '.') }} VND</td>
                                     </tr>
                                 {% endfor %}
                             {% endif %}

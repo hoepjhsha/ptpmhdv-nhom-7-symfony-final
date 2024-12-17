@@ -15,7 +15,7 @@ class OrderHistory
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'orderHistories')]
+    #[ORM\ManyToOne(targetEntity: User::class, cascade: ['persist', 'remove'], inversedBy: 'orderHistories')]
     #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private ?User $user = null;
 
@@ -31,27 +31,22 @@ class OrderHistory
     private ?int $status = null;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 65, scale: 2)]
-    private ?string $total_price = null;
+    private ?string $total_amount = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $created_at = null;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?\DateTimeInterface $updated_at = null;
 
-    /**
-     * Define payment type of order: 0 - Cash, 1 - VNPay
-     *
-     * @var int|null
-     */
-    #[ORM\Column(type: Types::SMALLINT)]
-    private ?int $payment_type = null;
-
-    #[ORM\OneToOne(targetEntity: Transaction::class, inversedBy: 'orderHistory', cascade: ['persist', 'remove'])]
-    #[ORM\JoinColumn(name: 'transact_id', referencedColumnName: 'id', nullable: true, onDelete: 'CASCADE')]
-    private ?Transaction $transact = null;
+    #[ORM\OneToOne(targetEntity: Payment::class, mappedBy: 'orderHistory', cascade: ['persist', 'remove'])]
+    private ?Payment $payment = null;
 
     public function __construct()
     {
         $this->status = 0;
+        $this->created_at = new \DateTime();
+        $this->updated_at = new \DateTime();
     }
 
     public function getId(): ?int
@@ -78,14 +73,14 @@ class OrderHistory
         return $this;
     }
 
-    public function getTotalPrice(): ?string
+    public function getTotalAmount(): ?string
     {
-        return $this->total_price;
+        return $this->total_amount;
     }
 
-    public function setTotalPrice(string $total_price): static
+    public function setTotalAmount(?string $total_amount): static
     {
-        $this->total_price = $total_price;
+        $this->total_amount = $total_amount;
 
         return $this;
     }
@@ -95,11 +90,21 @@ class OrderHistory
         return $this->created_at;
     }
 
-    public function setCreatedAt(\DateTimeInterface $created_at): static
+    public function setCreatedAt(?\DateTimeInterface $created_at): static
     {
         $this->created_at = $created_at;
 
         return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeInterface
+    {
+        return $this->updated_at;
+    }
+
+    public function setUpdatedAt(?\DateTimeInterface $updated_at): void
+    {
+        $this->updated_at = $updated_at;
     }
 
     public function getOrderItems(): array
@@ -126,26 +131,18 @@ class OrderHistory
         return $this;
     }
 
-    public function getPaymentType(): ?int
+    public function getPayment(): ?Payment
     {
-        return $this->payment_type;
+        return $this->payment;
     }
 
-    public function setPaymentType(int $payment_type): static
+    public function setPayment(Payment $payment): static
     {
-        $this->payment_type = $payment_type;
+        if ($payment->getOrderHistory() !== $this) {
+            $payment->setOrderHistory($this);
+        }
 
-        return $this;
-    }
-
-    public function getTransact(): ?Transaction
-    {
-        return $this->transact;
-    }
-
-    public function setTransact(?Transaction $transact): static
-    {
-        $this->transact = $transact;
+        $this->payment = $payment;
 
         return $this;
     }

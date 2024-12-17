@@ -5,6 +5,7 @@ namespace App\DataFixtures;
 use App\Entity\Category;
 use App\Entity\Item;
 use App\Entity\OrderHistory;
+use App\Entity\Payment;
 use App\Entity\Transaction;
 use App\Entity\User;
 use DateInvalidOperationException;
@@ -122,43 +123,41 @@ class AppFixtures extends Fixture
 
             $totalPrice = mt_rand(200000, 15000000) / 100;
 
-            $orderHistory->setTotalPrice(number_format($totalPrice, 2, '.', ''));
+            $orderHistory->setTotalAmount(number_format($totalPrice, 2, '.', ''));
             $createdAt = $this->getRandomDateWithinLast3Months();
             $orderHistory->setStatus(2);
-            $orderHistory->setPaymentType(mt_rand(0, 1));
             $orderHistory->setCreatedAt($createdAt);
             $orderHistory->setOrderItems(['item1', 'item2', 'item3']);
 
-            $amount = mt_rand(100000, 50000000);
-            $bankCode = 'TEMP';
-            $bankTranNo = 'VNP' . mt_rand(10000000, 99999999);
-            $cardType = ['ATM', 'Credit', 'Debit'][array_rand(['ATM', 'Credit', 'Debit'])];
-            $orderInfo = 'Thanh toan GD:' . mt_rand(1000, 9999);
-            $payDate = (new \DateTime())->format('YmdHis');
-            $responseCode = ['00', '01', '02'][array_rand(['00', '01', '02'])];
-            $tmnCode = 'NED' . mt_rand(1000, 9999);
-            $transactionNo = (string)mt_rand(10000000, 99999999);
-            $transactionStatus = ['00', '01', '02'][array_rand(['00', '01', '02'])];
-            $txnRef = (string)mt_rand(1000, 9999);
-            $secureHash = hash('sha256', $amount . $bankTranNo . $txnRef . random_bytes(16));
+            $payment = new Payment();
+            $payment->setOrderHistory($orderHistory);
+            $payment->setPaymentMethod(1);
+            $payment->setStatus(1);
+            $payment->setPaidAt(new \DateTime());
 
             $transaction = new Transaction();
-            $transaction->setAmount((string)$amount);
-            $transaction->setBankCode($bankCode);
-            $transaction->setBankTranNo($bankTranNo);
-            $transaction->setCardType($cardType);
-            $transaction->setOrderInfo($orderInfo);
-            $transaction->setPayDate($payDate);
-            $transaction->setResponseCode($responseCode);
-            $transaction->setTmnCode($tmnCode);
-            $transaction->setTransactionNo($transactionNo);
-            $transaction->setTransactionStatus($transactionStatus);
-            $transaction->setTxnRef($txnRef);
-            $transaction->setSecureHash($secureHash);
+            $transaction->setTransactionFor(0);
+            $transaction->setPayment($payment);
+            $transaction->setAmount($orderHistory->getTotalAmount());
+            $transaction->setBankCode('TEMP');
+            $transaction->setBankTranNo('VNP' . mt_rand(10000000, 99999999));
+            $transaction->setCardType(['ATM', 'Credit', 'Debit'][array_rand(['ATM', 'Credit', 'Debit'])]);
+            $transaction->setOrderInfo('Thanh toan GD:' . mt_rand(1000, 9999));
+            $transaction->setPayDate((new \DateTime())->format('YmdHis'));
+            $transaction->setResponseCode('00');
+            $transaction->setTmnCode('NED' . mt_rand(1000, 9999));
+            $transaction->setTransactionNo((string)mt_rand(10000000, 99999999));
+            $transaction->setTransactionStatus('00');
+            $transaction->setTxnRef((string)mt_rand(1000, 9999));
+            $transaction->setSecureHash(hash('sha256', $transaction->getAmount() . $transaction->getBankTranNo() . $transaction->getTxnRef() . random_bytes(16)));
 
             $manager->persist($transaction);
 
-            $orderHistory->setTransact($transaction);
+            $payment->setTransaction($transaction);
+
+            $manager->persist($payment);
+
+            $orderHistory->setPayment($payment);
 
             $manager->persist($orderHistory);
         }

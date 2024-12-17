@@ -18,24 +18,24 @@
                             </thead>
                             <tbody>
                             <form id="updateCartForm" action="{{ path('shop_cart_update') }}" method="POST">
-                            {% if orderItems is not null %}
-                                {% for orderItem in orderItems %}
+                            {% if cartItems is not null %}
+                                {% for cartItem in cartItems %}
                                     <tr>
                                         <td>
-                                            <img src="{{ orderItem.item.itemImage }}" alt="" height="36">
+                                            <img src="{{ cartItem.item.itemImage }}" alt="" height="36">
                                             <p class="d-inline-block align-middle mb-0">
-                                                <a href="{{ url('shop_view', {id: orderItem.item.id}) }}" class="d-inline-block align-middle mb-0 product-name">{{ orderItem.item.itemName }}</a>
+                                                <a href="{{ url('shop_view', {id: cartItem.item.id}) }}" class="d-inline-block align-middle mb-0 product-name">{{ cartItem.item.itemName }}</a>
                                                 <br>
-                                                <span class="text-muted font-13">Category: {{ orderItem.item.category.categoryName }}</span>
+                                                <span class="text-muted font-13">Category: {{ cartItem.item.category.categoryName }}</span>
                                             </p>
                                         </td>
-                                        <td>{{ orderItem.item.itemPrice }}</td>
+                                        <td>{{ cartItem.item.itemPrice }}</td>
                                         <td>
-                                            <input class="form-control form-control-sm w-25" name="quantity[{{ orderItem.id }}]" type="number" value="{{ orderItem.quantity }}" id="example-number-input1">
+                                            <input class="form-control form-control-sm w-25" name="quantity[{{ cartItem.id }}]" type="number" value="{{ cartItem.quantity }}" id="example-number-input1">
                                         </td>
-                                        <td>{{ (orderItem.item.itemPrice * orderItem.quantity) | number_format(0, ',', '.') }} VND</td>
+                                        <td>{{ (cartItem.item.itemPrice * cartItem.quantity) | number_format(0, ',', '.') }} VND</td>
                                         <td>
-                                            <a href="{{ url('shop_cart_remove', {id: orderItem.item.id}) }}" class="text-dark"><i class="mdi mdi-close-circle-outline font-18"></i></a>
+                                            <a href="{{ url('shop_cart_remove', {id: cartItem.item.id}) }}" class="text-dark"><i class="mdi mdi-close-circle-outline font-18"></i></a>
                                         </td>
                                     </tr>
                                 {% endfor %}

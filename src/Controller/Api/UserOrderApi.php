@@ -36,19 +36,15 @@ class UserOrderApi extends BaseController
      */
     private OrderHistoryRepository|EntityRepository $orderHistoryRepository;
 
-    private Security $security;
-
     /**
      * Constructor.
      *
      * @param EntityManagerInterface $manager
-     * @param Security $security
      */
-    public function __construct(EntityManagerInterface $manager, Security $security)
+    public function __construct(EntityManagerInterface $manager)
     {
         $this->em = $manager;
         $this->orderHistoryRepository = $this->em->getRepository(OrderHistory::class);
-        $this->security = $security;
     }
 
     #[Route(path: '/get-user-orders', name: 'user_order_list', methods: ['GET'])]
@@ -64,7 +60,7 @@ class UserOrderApi extends BaseController
                 'id' => $order->getId(),
                 'order_items' => $order->getOrderItems(),
                 'status' => $order->getStatus(),
-                'total_price' => $order->getTotalPrice(),
+                'total_amount' => $order->getTotalAmount(),
                 'action' => [
                     'refund' => '',
                     'cancel' => $this->generateUrl('account_order_cancel', ['id' => $order->getId()]),

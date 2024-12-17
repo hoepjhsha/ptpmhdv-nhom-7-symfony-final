@@ -11,8 +11,7 @@ namespace App\Controller\Shop;
 
 use App\Controller\BaseController;
 use App\Entity\User;
-use App\Entity\Wallet;
-use App\Repository\OrderRepository;
+use App\Repository\CartRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Response;
@@ -23,15 +22,13 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 #[IsGranted('PUBLIC_ACCESS')]
 class ShopController extends BaseController
 {
-    private EntityManagerInterface $em;
-    private OrderRepository $orderRepository;
+    private CartRepository $cartRepository;
     private Security $security;
 
-    public function __construct(OrderRepository $orderRepository, Security $security, EntityManagerInterface $em)
+    public function __construct(CartRepository $cartRepository, Security $security)
     {
-        $this->orderRepository = $orderRepository;
+        $this->cartRepository = $cartRepository;
         $this->security = $security;
-        $this->em = $em;
     }
 
     #[Route(path: '', name: 'list', methods: ['GET'])]
@@ -40,19 +37,6 @@ class ShopController extends BaseController
         $user = $this->security->getUser();
         if (!$user instanceof User) {
             return $this->redirectToRoute('app_login');
-        }
-
-        $wallet = $user->getWallet();
-
-        if (!$wallet) {
-            $wallet = new Wallet();
-            $wallet->setUser($user);
-
-            $this->em->persist($wallet);
-
-            $user->setWallet($wallet);
-            $this->em->persist($user);
-            $this->em->flush();
         }
 
         $items = $this->getJsonArray('http://dastonehdv.local' . $this->generateUrl('api_item_shop_list'));
@@ -90,18 +74,18 @@ class ShopController extends BaseController
             return $this->redirectToRoute('app_login');
         }
 
-        $order = $this->orderRepository->getOrCreateOrderForUser($user);
-        $orderItems = $order->getOrderItems();
+        $cart = $this->cartRepository->getOrCreateCartForUser($user);
+        $cartItems = $cart->getCartItems();
 
-        if ($orderItems->isEmpty()) {
+        if ($cartItems->isEmpty()) {
             $this->addFlash('error', 'Your cart is empty. Cannot proceed to checkout.');
 
             return $this->redirectToRoute('shop_cart');
         }
 
         $data = [];
-        foreach ($orderItems as $orderItem) {
-            $data[] = $orderItem;
+        foreach ($cartItems as $cartItem) {
+            $data[] = $cartItem;
         }
 
         $totalMoney = 0;
@@ -111,7 +95,7 @@ class ShopController extends BaseController
 
         return $this->render('shop/checkout.html.twig', [
             'page_title' => 'Checkout',
-            'orderItems' => $data,
+            'cartItems' => $data,
             'totalMoney' => $totalMoney,
         ]);
     }
