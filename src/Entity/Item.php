@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\ItemRepository;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -37,10 +39,10 @@ class Item
     private ?string $item_description = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $created_at = null;
+    private ?DateTimeInterface $created_at;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $updated_at = null;
+    private ?DateTimeInterface $updated_at;
 
     /**
      * @var Collection<int, CartItem>
@@ -51,8 +53,8 @@ class Item
     public function __construct()
     {
         $this->cartItems = new ArrayCollection();
-        $this->created_at = new \DateTime();
-        $this->updated_at = new \DateTime();
+        $this->created_at = new DateTime();
+        $this->updated_at = new DateTime();
     }
 
     public function getId(): ?int
@@ -139,22 +141,22 @@ class Item
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getCreatedAt(): ?DateTimeInterface
     {
         return $this->created_at;
     }
 
-    public function setCreatedAt(?\DateTimeInterface $created_at): void
+    public function setCreatedAt(?DateTimeInterface $created_at): void
     {
         $this->created_at = $created_at;
     }
 
-    public function getUpdatedAt(): ?\DateTimeInterface
+    public function getUpdatedAt(): ?DateTimeInterface
     {
         return $this->updated_at;
     }
 
-    public function setUpdatedAt(?\DateTimeInterface $updated_at): void
+    public function setUpdatedAt(?DateTimeInterface $updated_at): void
     {
         $this->updated_at = $updated_at;
     }

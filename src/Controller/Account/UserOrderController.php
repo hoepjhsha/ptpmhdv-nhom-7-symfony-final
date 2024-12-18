@@ -18,7 +18,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route(path: '/account', name: 'account_')]
 #[IsGranted('ROLE_USER')]
-class UserOrderControler extends BaseController
+class UserOrderController extends BaseController
 {
     private EntityManagerInterface $em;
 

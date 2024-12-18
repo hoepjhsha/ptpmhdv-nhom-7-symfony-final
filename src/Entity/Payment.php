@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\PaymentRepository;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -35,13 +37,13 @@ class Payment
      * @var int|null
      */
     #[ORM\Column(type: Types::SMALLINT)]
-    private ?int $status = null;
+    private ?int $status;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $paid_at = null;
+    private ?DateTimeInterface $paid_at = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $created_at = null;
+    private ?DateTimeInterface $created_at;
 
     #[ORM\OneToOne(targetEntity: Transaction::class, mappedBy: 'payment', cascade: ['persist', 'remove'])]
     private ?Transaction $transaction = null;
@@ -55,7 +57,7 @@ class Payment
     public function __construct()
     {
         $this->status = 0;
-        $this->created_at = new \DateTime();
+        $this->created_at = new DateTime();
         $this->installments = new ArrayCollection();
     }
 
@@ -99,22 +101,22 @@ class Payment
         $this->status = $status;
     }
 
-    public function getPaidAt(): ?\DateTimeInterface
+    public function getPaidAt(): ?DateTimeInterface
     {
         return $this->paid_at;
     }
 
-    public function setPaidAt(?\DateTimeInterface $paid_at): void
+    public function setPaidAt(?DateTimeInterface $paid_at): void
     {
         $this->paid_at = $paid_at;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getCreatedAt(): ?DateTimeInterface
     {
         return $this->created_at;
     }
 
-    public function setCreatedAt(?\DateTimeInterface $created_at): void
+    public function setCreatedAt(?DateTimeInterface $created_at): void
     {
         $this->created_at = $created_at;
     }
@@ -157,7 +159,6 @@ class Payment
     public function removeInstallment(Installment $installment): static
     {
         if ($this->installments->removeElement($installment)) {
-            // set the owning side to null (unless already changed)
             if ($installment->getPayment() === $this) {
                 $installment->setPayment(null);
             }

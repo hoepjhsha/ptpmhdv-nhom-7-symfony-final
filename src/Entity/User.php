@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -27,7 +29,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var list<string> The user roles
      */
     #[ORM\Column]
-    private array $roles = [];
+    private array $roles;
 
     /**
      * @var ?string The hashed password
@@ -36,16 +38,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
-    private ?int $status = null;
+    private ?int $status;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 65, scale: 2)]
-    private ?string $credit_limit = null;
+    private ?string $credit_limit;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $created_at = null;
+    private ?DateTimeInterface $created_at;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $updated_at = null;
+    private ?DateTimeInterface $updated_at;
 
     #[ORM\OneToOne(targetEntity: Cart::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
     private ?Cart $cart = null;
@@ -61,8 +63,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->roles = ['ROLE_USER'];
         $this->status = 1;
         $this->credit_limit = '11000000.00';
-        $this->created_at = new \DateTime();
-        $this->updated_at = new \DateTime();
+        $this->created_at = new DateTime();
+        $this->updated_at = new DateTime();
         $this->orderHistories = new ArrayCollection();
     }
 
@@ -159,24 +161,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->credit_limit = $credit_limit;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getCreatedAt(): ?DateTimeInterface
     {
         return $this->created_at;
     }
 
-    public function setCreatedAt(\DateTimeInterface $created_at): static
+    public function setCreatedAt(DateTimeInterface $created_at): static
     {
         $this->created_at = $created_at;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeInterface
+    public function getUpdatedAt(): ?DateTimeInterface
     {
         return $this->updated_at;
     }
 
-    public function setUpdatedAt(\DateTimeInterface $updated_at): static
+    public function setUpdatedAt(DateTimeInterface $updated_at): static
     {
         $this->updated_at = $updated_at;
 

@@ -17,6 +17,8 @@ use App\Entity\User;
 use App\Repository\CartRepository;
 use App\Services\SpayLaterService;
 use App\Services\VNPayService;
+use DateMalformedStringException;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
@@ -86,8 +88,6 @@ class PaymentController extends BaseController
                     return $this->redirectToRoute('app_login');
                 }
 
-                $cart = $this->cartRepository->getOrCreateCartForUser($user);
-
                 $cart = $this->cartRepository->findOneBy(['user' => $user]);
                 if (!$cart) {
                     $this->addFlash('error', 'Your cart is empty.');
@@ -115,16 +115,15 @@ class PaymentController extends BaseController
                 $orderHistory->setUser($user);
                 $orderHistory->setOrderItems($itemsSummary);
                 $orderHistory->setTotalAmount($totalPrice);
-                $orderHistory->setCreatedAt(new \DateTime());
+                $orderHistory->setCreatedAt(new DateTime());
 
                 $payment = new Payment();
                 $payment->setOrderHistory($orderHistory);
                 $payment->setPaymentMethod(1);
                 $payment->setStatus(1);
-                $payment->setPaidAt(new \DateTime());
+                $payment->setPaidAt(new DateTime());
 
                 $transaction = new Transaction();
-                $transaction->setTransactionFor(0);
                 $transaction->setPayment($payment);
                 $transaction->setAmount($data['vnp_Amount']);
                 $transaction->setBankCode($data['vnp_BankCode']);
@@ -168,17 +167,18 @@ class PaymentController extends BaseController
         return $this->redirectToRoute('shop_cart');
     }
 
+    /**
+     * @throws DateMalformedStringException
+     */
     #[Route(path: 'installment/create', name: 'installment_create', methods: ['POST'])]
-    public function createInstallments(Request $request) {
-        $amount = $request->request->get('amount');
+    public function createInstallments(Request $request): Response
+    {
         $installmentCount = $request->request->get('installmentCount');
 
         $user = $this->security->getUser();
         if (!$user instanceof User) {
             return $this->redirectToRoute('app_login');
         }
-
-        $cart = $this->cartRepository->getOrCreateCartForUser($user);
 
         $cart = $this->cartRepository->findOneBy(['user' => $user]);
         if (!$cart) {
@@ -206,13 +206,13 @@ class PaymentController extends BaseController
         $orderHistory->setUser($user);
         $orderHistory->setOrderItems($itemsSummary);
         $orderHistory->setTotalAmount($totalPrice);
-        $orderHistory->setCreatedAt(new \DateTime());
+        $orderHistory->setCreatedAt(new DateTime());
 
         $payment = new Payment();
         $payment->setOrderHistory($orderHistory);
         $payment->setPaymentMethod(2);
         $payment->setStatus(0);
-        $payment->setPaidAt(new \DateTime());
+        $payment->setPaidAt(new DateTime());
 
         $this->spayLaterService->createInstallments($payment, $installmentCount);
 
@@ -221,6 +221,8 @@ class PaymentController extends BaseController
         }
 
         $this->em->persist($cart);
+
+        $user->setCreditLimit($user->getCreditLimit() - $totalPrice);
 
         $this->em->flush();
 

@@ -2,8 +2,6 @@
 
 namespace App\Repository;
 
-use App\Entity\Item;
-use App\Entity\Cart;
 use App\Entity\CartItem;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;

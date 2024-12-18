@@ -4,6 +4,7 @@ namespace App\Repository;
 
 use App\Entity\Cart;
 use App\Entity\User;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
@@ -37,8 +38,8 @@ class CartRepository extends ServiceEntityRepository
         if (!$cart) {
             $cart = new Cart();
             $cart->setUser($user);
-            $cart->setCreatedAt(new \DateTime());
-            $cart->setUpdatedAt(new \DateTime());
+            $cart->setCreatedAt(new DateTime());
+            $cart->setUpdatedAt(new DateTime());
 
             $this->entityManager->persist($cart);
             $this->entityManager->flush();

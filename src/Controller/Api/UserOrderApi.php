@@ -15,8 +15,6 @@ use App\Entity\User;
 use App\Repository\OrderHistoryRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
-use http\Env\Request;
-use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Attribute\Route;
@@ -55,14 +53,13 @@ class UserOrderApi extends BaseController
         $orders = $this->orderHistoryRepository->findBy(['user' => $user]);
         $data = [];
 
-        foreach ($orders as $key => $order) {
+        foreach ($orders as $order) {
             $data[] = [
                 'id' => $order->getId(),
                 'order_items' => $order->getOrderItems(),
                 'status' => $order->getStatus(),
                 'total_amount' => $order->getTotalAmount(),
                 'action' => [
-                    'refund' => '',
                     'cancel' => $this->generateUrl('account_order_cancel', ['id' => $order->getId()]),
                 ],
             ];

@@ -57,7 +57,6 @@
                                         <td align="right">{{ orderItem.total_amount | number_format(0, ',', '.') }} VND</td>
                                         <td>{{ orderItem.status }}</td>
                                         <td>
-                                            <a class="fa fa-undo me-2" href="{{ orderItem.action.refund }}" style="cursor:pointer;"></a>
                                             <a class="fa fa-times" href="{{ orderItem.action.cancel }}" style="cursor:pointer;"></a>
                                         </td>
                                     </tr>

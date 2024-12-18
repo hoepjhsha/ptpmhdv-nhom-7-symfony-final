@@ -3,7 +3,6 @@
 namespace App\Entity;
 
 use App\Repository\TransactionRepository;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TransactionRepository::class)]
@@ -22,14 +21,6 @@ class Transaction
     #[ORM\OneToOne(targetEntity: Installment::class, inversedBy: 'transact', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(name: 'installment_id', referencedColumnName: 'id', nullable: true, onDelete: 'CASCADE')]
     private ?Installment $installment = null;
-
-    /**
-     * Define transaction for: 0 - Payment, 1 - Installment
-     *
-     * @var int|null
-     */
-    #[ORM\Column(type: Types::SMALLINT)]
-    private ?int $transaction_for = null;
 
     #[ORM\Column(length: 255)]
     private ?string $amount = null;
@@ -241,18 +232,6 @@ class Transaction
     public function setInstallment(?Installment $installment): static
     {
         $this->installment = $installment;
-
-        return $this;
-    }
-
-    public function getTransactionFor(): ?int
-    {
-        return $this->transaction_for;
-    }
-
-    public function setTransactionFor(int $transaction_for): static
-    {
-        $this->transaction_for = $transaction_for;
 
         return $this;
     }

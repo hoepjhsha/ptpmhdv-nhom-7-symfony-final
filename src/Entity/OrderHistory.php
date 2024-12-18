@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\OrderHistoryRepository;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -28,16 +30,16 @@ class OrderHistory
      * @var int|null
      */
     #[ORM\Column(type: Types::SMALLINT)]
-    private ?int $status = null;
+    private ?int $status;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 65, scale: 2)]
     private ?string $total_amount = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $created_at = null;
+    private ?DateTimeInterface $created_at;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $updated_at = null;
+    private ?DateTimeInterface $updated_at;
 
     #[ORM\OneToOne(targetEntity: Payment::class, mappedBy: 'orderHistory', cascade: ['persist', 'remove'])]
     private ?Payment $payment = null;
@@ -45,8 +47,8 @@ class OrderHistory
     public function __construct()
     {
         $this->status = 0;
-        $this->created_at = new \DateTime();
-        $this->updated_at = new \DateTime();
+        $this->created_at = new DateTime();
+        $this->updated_at = new DateTime();
     }
 
     public function getId(): ?int
@@ -85,24 +87,24 @@ class OrderHistory
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getCreatedAt(): ?DateTimeInterface
     {
         return $this->created_at;
     }
 
-    public function setCreatedAt(?\DateTimeInterface $created_at): static
+    public function setCreatedAt(?DateTimeInterface $created_at): static
     {
         $this->created_at = $created_at;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeInterface
+    public function getUpdatedAt(): ?DateTimeInterface
     {
         return $this->updated_at;
     }
 
-    public function setUpdatedAt(?\DateTimeInterface $updated_at): void
+    public function setUpdatedAt(?DateTimeInterface $updated_at): void
     {
         $this->updated_at = $updated_at;
     }

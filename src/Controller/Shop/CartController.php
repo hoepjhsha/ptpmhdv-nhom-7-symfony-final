@@ -11,7 +11,6 @@ namespace App\Controller\Shop;
 
 use App\Controller\BaseController;
 use App\Entity\Item;
-use App\Entity\Cart;
 use App\Entity\CartItem;
 use App\Entity\User;
 use App\Repository\CartItemRepository;
@@ -84,7 +83,6 @@ class CartController extends BaseController
             return $this->redirectToRoute('app_login');
         }
 
-        $itemId = $request->request->get($id);
         $item = $this->em->getRepository(Item::class)->find($id);
 
         $cart = $this->cartRepository->getOrCreateCartForUser($user);
@@ -105,8 +103,6 @@ class CartController extends BaseController
         if (!$user instanceof User) {
             return $this->redirectToRoute('app_login');
         }
-
-        $cart = $this->cartRepository->getOrCreateCartForUser($user);
 
         $quantities = $request->request->all('quantity');
 

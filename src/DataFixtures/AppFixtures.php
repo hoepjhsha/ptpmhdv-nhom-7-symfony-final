@@ -8,8 +8,10 @@ use App\Entity\OrderHistory;
 use App\Entity\Payment;
 use App\Entity\Transaction;
 use App\Entity\User;
+use DateInterval;
 use DateInvalidOperationException;
 use DateMalformedStringException;
+use DateTime;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -133,17 +135,16 @@ class AppFixtures extends Fixture
             $payment->setOrderHistory($orderHistory);
             $payment->setPaymentMethod(1);
             $payment->setStatus(1);
-            $payment->setPaidAt(new \DateTime());
+            $payment->setPaidAt(new DateTime());
 
             $transaction = new Transaction();
-            $transaction->setTransactionFor(0);
             $transaction->setPayment($payment);
             $transaction->setAmount($orderHistory->getTotalAmount());
             $transaction->setBankCode('TEMP');
             $transaction->setBankTranNo('VNP' . mt_rand(10000000, 99999999));
             $transaction->setCardType(['ATM', 'Credit', 'Debit'][array_rand(['ATM', 'Credit', 'Debit'])]);
             $transaction->setOrderInfo('Thanh toan GD:' . mt_rand(1000, 9999));
-            $transaction->setPayDate((new \DateTime())->format('YmdHis'));
+            $transaction->setPayDate((new DateTime())->format('YmdHis'));
             $transaction->setResponseCode('00');
             $transaction->setTmnCode('NED' . mt_rand(1000, 9999));
             $transaction->setTransactionNo((string)mt_rand(10000000, 99999999));
@@ -169,11 +170,11 @@ class AppFixtures extends Fixture
      * @throws DateMalformedStringException
      * @throws DateInvalidOperationException
      */
-    private function getRandomDateWithinLast3Months(): \DateTime
+    private function getRandomDateWithinLast3Months(): DateTime
     {
-        $now = new \DateTime();
+        $now = new DateTime();
 
-        $interval = new \DateInterval('P3M');
+        $interval = new DateInterval('P3M');
         $now->sub($interval);
 
         $randomDays = mt_rand(0, 90);

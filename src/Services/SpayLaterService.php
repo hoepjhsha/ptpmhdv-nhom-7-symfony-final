@@ -11,37 +11,36 @@ namespace App\Services;
 
 use App\Entity\Installment;
 use App\Entity\Payment;
+use DateMalformedStringException;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
 
 class SpayLaterService
 {
     private float $SPayLater_installment_conversion_fee;
     private int $SpayLater_late_fee;
     private EntityManagerInterface $em;
-    private VNPayService $vnpService;
 
-    public function __construct(EntityManagerInterface $em, VNPayService $vnpService, float $SPayLater_installment_conversion_fee, int $SpayLater_late_fee)
+    public function __construct(EntityManagerInterface $em, float $SPayLater_installment_conversion_fee, int $SpayLater_late_fee)
     {
         $this->em = $em;
-        $this->vnpService = $vnpService;
         $this->SPayLater_installment_conversion_fee = $SPayLater_installment_conversion_fee;
         $this->SpayLater_late_fee = $SpayLater_late_fee;
     }
 
     /**
-     * @throws \DateMalformedStringException
+     * @throws DateMalformedStringException
      */
     public function createInstallments(Payment $order, int $installmentCount): void
     {
         $totalAmount = $order->getOrderHistory()->getTotalAmount();
         $installmentAmount = $totalAmount / $installmentCount;
 
-        $currentDate = new \DateTime();
+        $currentDate = new DateTime();
         $currentMonth = (int)$currentDate->format('m');
         $currentYear = (int)$currentDate->format('Y');
 
-        $dueDate = new \DateTime("$currentYear-$currentMonth-10 23:59:59");
+        $dueDate = new DateTime("$currentYear-$currentMonth-10 23:59:59");
         if ($currentDate->format('d') >= 24) {
             $dueDate->modify('+2 month');
         } else {
@@ -52,7 +51,7 @@ class SpayLaterService
             $installment = new Installment();
             $installment->setPayment($order);
             $installment->setInstallmentNo($i);
-            $installment->setAmount($totalAmount / $installmentCount);
+            $installment->setAmount($installmentAmount);
             $installment->setLaterFee($totalAmount * $this->SPayLater_installment_conversion_fee);
             $installment->setDueDate($dueDate);
 

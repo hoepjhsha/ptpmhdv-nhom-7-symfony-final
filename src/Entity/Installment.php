@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\InstallmentRepository;
+use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -29,13 +30,13 @@ class Installment
     private ?string $later_fee = null;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $due_date = null;
+    private ?DateTimeInterface $due_date = null;
 
     #[ORM\Column]
-    private ?bool $paid = null;
+    private ?bool $paid;
 
     #[ORM\Column(type: Types::DECIMAL, precision: 65, scale: 2)]
-    private ?string $late_fee = null;
+    private ?string $late_fee;
 
     #[ORM\OneToOne(targetEntity: Transaction::class, mappedBy: 'installment', cascade: ['persist', 'remove'])]
     private ?Transaction $transact = null;
@@ -104,12 +105,12 @@ class Installment
         $this->later_fee = $later_fee;
     }
 
-    public function getDueDate(): ?\DateTimeInterface
+    public function getDueDate(): ?DateTimeInterface
     {
         return $this->due_date;
     }
 
-    public function setDueDate(\DateTimeInterface $due_date): static
+    public function setDueDate(DateTimeInterface $due_date): static
     {
         $this->due_date = $due_date;
 
