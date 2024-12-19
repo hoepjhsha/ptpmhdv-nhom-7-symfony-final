@@ -54,7 +54,7 @@ class SpayLaterController extends BaseController
             }
         }
 
-        dd($this->splitGroupByMonthYear($installments));
+//        dd($this->splitGroupByMonthYear($installments));
 
         return $this->render('account/spaylater.html.twig', [
             'page_title' => 'Spay Later',
@@ -68,7 +68,11 @@ class SpayLaterController extends BaseController
     private function splitGroupByMonthYear(array $installments): array
     {
         if (empty($installments)) {
-            return [];
+            return [
+                'current' => [],
+                'unpaid' => [],
+                'paid' => []
+            ];
         }
 
         $currentDate = new DateTime();
