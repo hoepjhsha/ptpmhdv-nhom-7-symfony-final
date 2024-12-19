@@ -19,12 +19,15 @@
                             <div class="card">
                                 <div class="card-body d-flex flex-row justify-content-between align-items-center">
                                     <div>
-                                        <h3>0 VNĐ</h3>
+                                        <h3>{{ (groupedInstallments.current.total_amount + groupedInstallments.current.total_fee + groupedInstallments.current.total_late_fee) | number_format(0, ',', '.') }} VNĐ</h3>
                                         <h5 class="text-secondary">Payment period from 24th to 10th</h5>
                                     </div>
-                                    <div>
-                                        <h2><i class="fas fa-angle-right" style="cursor: pointer"></i></h2>
-                                    </div>
+
+                                    {% if groupedInstallments.current.installments is not empty %}
+                                        <div class="button-items">
+                                            <button type="button" class="btn btn-outline-primary">Pay</button>
+                                        </div>
+                                    {% endif %}
                                 </div>
                             </div>
                         </div>
@@ -50,61 +53,52 @@
 
                             <!-- Tab panes -->
                             <div class="tab-content">
+
                                 <div class="tab-pane p-3 active" id="unpaid" role="tabpanel">
                                     <div><h4 class="text-secondary">Next bills</h4></div>
-                                    <div class="card">
-                                        <div class="card-body d-flex flex-row justify-content-between align-items-center">
-                                            <div>
-                                                <h4>December</h4>
-                                                <h6 class="text-secondary">Payment period from 24th to 10th</h6>
+
+                                    {% if groupedInstallments.unpaid is empty %}
+                                        <div class="d-flex align-items-center justify-content-center"><h4 class="text-black-50">None</h4></div>
+                                    {% else %}
+                                        {% for installment in groupedInstallments.unpaid %}
+                                            <div class="card">
+                                                <div class="card-body d-flex flex-row justify-content-between align-items-center">
+                                                    <div>
+                                                        <h4>{{ installment.label }}</h4>
+                                                        <h6 class="text-secondary">Payment period from 24th to 10th</h6>
+                                                    </div>
+                                                    <div class="d-flex">
+                                                        <h4 class="me-3">{{ (installment.total_amount + installment.total_fee + installment.total_late_fee) | number_format(0, ',', '.') }} VNĐ</h4>
+                                                        <h4><i class="fas fa-angle-right" style="cursor: pointer"></i></h4>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="d-flex">
-                                                <h4 class="me-3">300.000 VNĐ</h4>
-                                                <h4><i class="fas fa-angle-right" style="cursor: pointer"></i></h4>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card">
-                                        <div class="card-body d-flex flex-row justify-content-between align-items-center">
-                                            <div>
-                                                <h4>January</h4>
-                                                <h6 class="text-secondary">Payment period from 24th to 10th</h6>
-                                            </div>
-                                            <div class="d-flex">
-                                                <h4 class="me-3">300.000 VNĐ</h4>
-                                                <h4><i class="fas fa-angle-right" style="cursor: pointer"></i></h4>
-                                            </div>
-                                        </div>
-                                    </div>
+                                        {% endfor %}
+                                    {% endif %}
+
                                 </div>
+
                                 <div class="tab-pane p-3" id="paid" role="tabpanel">
-
-                                    <div class="card">
-                                        <div class="card-body d-flex flex-row justify-content-between align-items-center">
-                                            <div>
-                                                <h4>November</h4>
-                                                <h6 class="text-secondary">Payment period from 24th to 10th</h6>
+                                    {% if groupedInstallments.paid is empty %}
+                                        <div class="d-flex align-items-center justify-content-center"><h4 class="text-black-50">None</h4></div>
+                                    {% else %}
+                                        {% for installment in groupedInstallments.paid %}
+                                            <div class="card">
+                                                <div class="card-body d-flex flex-row justify-content-between align-items-center">
+                                                    <div>
+                                                        <h4>{{ installment.label }}</h4>
+                                                        <h6 class="text-secondary">Payment period from 24th to 10th</h6>
+                                                    </div>
+                                                    <div class="d-flex">
+                                                        <h4 class="me-3">{{ (installment.total_amount + installment.total_fee + installment.total_late_fee) | number_format(0, ',', '.') }} VNĐ</h4>
+                                                        <h4><i class="fas fa-angle-right" style="cursor: pointer"></i></h4>
+                                                    </div>
+                                                </div>
                                             </div>
-                                            <div class="d-flex">
-                                                <h4 class="me-3">300.000 VNĐ</h4>
-                                                <h4><i class="fas fa-angle-right" style="cursor: pointer"></i></h4>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="card">
-                                        <div class="card-body d-flex flex-row justify-content-between align-items-center">
-                                            <div>
-                                                <h4>October</h4>
-                                                <h6 class="text-secondary">Payment period from 24th to 10th</h6>
-                                            </div>
-                                            <div class="d-flex">
-                                                <h4 class="me-3">300.000 VNĐ</h4>
-                                                <h4><i class="fas fa-angle-right" style="cursor: pointer"></i></h4>
-                                            </div>
-                                        </div>
-                                    </div>
-
+                                        {% endfor %}
+                                    {% endif %}
                                 </div>
+
                             </div>
 
                         </div>

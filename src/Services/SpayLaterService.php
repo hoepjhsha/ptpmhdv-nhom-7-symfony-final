@@ -52,7 +52,7 @@ class SpayLaterService
             $installment->setPayment($order);
             $installment->setInstallmentNo($i);
             $installment->setAmount($installmentAmount);
-            $installment->setLaterFee($totalAmount * $this->SPayLater_installment_conversion_fee);
+            $installment->setLaterFee((int)($totalAmount * $this->SPayLater_installment_conversion_fee));
             $installment->setDueDate($dueDate);
 
             $this->em->persist($installment);

@@ -3,6 +3,7 @@
 namespace App\Entity;
 
 use App\Repository\InstallmentRepository;
+use DateTime;
 use DateTimeInterface;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
@@ -38,6 +39,9 @@ class Installment
     #[ORM\Column(type: Types::DECIMAL, precision: 65, scale: 2)]
     private ?string $late_fee;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?DateTimeInterface $created_at;
+
     #[ORM\OneToOne(targetEntity: Transaction::class, mappedBy: 'installment', cascade: ['persist', 'remove'])]
     private ?Transaction $transact = null;
 
@@ -45,6 +49,7 @@ class Installment
     {
         $this->paid = false;
         $this->late_fee = '0.00';
+        $this->created_at = new DateTime();
     }
 
     public function getId(): ?int
@@ -139,6 +144,16 @@ class Installment
         $this->late_fee = $late_fee;
 
         return $this;
+    }
+
+    public function getCreatedAt(): ?DateTimeInterface
+    {
+        return $this->created_at;
+    }
+
+    public function setCreatedAt(?DateTimeInterface $created_at): void
+    {
+        $this->created_at = $created_at;
     }
 
     public function getTransact(): ?Transaction

@@ -30,7 +30,6 @@ services:
     App\Services\SpayLaterService:
         arguments:
             $em: '@Doctrine\ORM\EntityManagerInterface'
-            $vnpService: '@App\Services\VNPayService'
             $SPayLater_installment_conversion_fee: '%env(SPayLater_installment_conversion_fee)%'
             $SpayLater_late_fee: '%env(SpayLater_late_fee)%'
     # add more service definitions when explicit configuration is needed
