@@ -31,7 +31,10 @@
 
                                         {% if groupedInstallments.current.installments is not empty %}
                                             <div class="button-items">
-                                                <button type="button" class="btn btn-outline-primary">Pay</button>
+                                                <form action="{{ url('account_payment_create') }}" method="post">
+                                                    <input type="hidden" name="amount" value="{{ groupedInstallments.current.total_amount + groupedInstallments.current.total_fee + groupedInstallments.current.total_late_fee }}">
+                                                    <button type="submit" class="btn btn-outline-primary">Pay</button>
+                                                </form>
                                             </div>
                                         {% endif %}
                                     {% endif %}
