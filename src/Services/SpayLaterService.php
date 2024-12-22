@@ -61,4 +61,26 @@ class SpayLaterService
             $dueDate->modify('+1 month');
         }
     }
+
+    public function applyLateFeeForOverdueInstallment(): void
+    {
+        $today = new DateTime('2025-01-11');
+
+        if ($today->format('d') > 10) {
+            $installments = $this->em->getRepository(Installment::class)->findAll();
+
+            $overdueInstallments = [];
+            foreach ($installments as $installment) {
+                if ($installment->getDueDate() < $today && !$installment->isPaid()) {
+                    $overdueInstallments[] = $installment;
+                }
+            }
+
+            foreach ($overdueInstallments as $installment) {
+                $installment->setLateFee($installment->getLateFee() + $this->SpayLater_late_fee);
+                $installment->setDueDate((clone $installment->getDueDate())->modify('+1 month'));
+                $this->em->flush();
+            }
+        }
+    }
 }
