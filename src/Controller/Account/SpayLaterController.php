@@ -76,7 +76,7 @@ class SpayLaterController extends BaseController
             'bankCode' => '',
         ];
 
-        $this->vnpService->setVnpReturnurl($this->generateUrl('account_payment_callback'));
+        $this->vnpService->setVnpReturnurl('http://dastonehdv.local' . $this->generateUrl('account_payment_callback'));
 
         $paymentUrl = $this->vnpService->createPaymentUrl($data);
 
@@ -134,6 +134,7 @@ class SpayLaterController extends BaseController
                 $currentDate = new DateTime('2024-12-24');
                 $currentKey = (clone $currentDate)->format('Y-m');
 
+                $total_amount = 0;
                 foreach ($this->em->getRepository(OrderHistory::class)->findBy(['user' => $user]) as $order) {
                     if ($order->getPayment()->getPaymentMethod() == 2) {
                         foreach ($order->getPayment()->getInstallments() as $installment) {
@@ -154,12 +155,15 @@ class SpayLaterController extends BaseController
                             if ($found) {
                                 $installment->setPaid(true);
                                 $installment->setTransact($transaction);
+                                $total_amount += $installment->getAmount();
 
                                 $this->em->flush();
                             }
                         }
                     }
                 }
+
+                $user->setCreditLimit($user->getCreditLimit() + $total_amount);
 
                 $this->addFlash('success', 'Paid successful! Your installment has been paid.');
             } else {
@@ -218,9 +222,9 @@ class SpayLaterController extends BaseController
                 $previousMonthKey = (clone $dueDate)->modify('-1 month')->format('Y-m');
                 $previousMonthLabel = (clone $dueDate)->modify('-1 month')->format('F Y');
 
-                if ($currentKey == $previousMonthKey && $currentDate->format('d') >= 24) {
+                if (!$installment->isPaid() && $currentKey == $previousMonthKey && $currentDate->format('d') >= 24) {
                     $group = &$groupedInstallments['current'];
-                } else if ($currentDate->format('d') <= 10 && $currentKey == (clone $dueDate)->format('Y-m')) {
+                } else if (!$installment->isPaid() && $currentDate->format('d') <= 10 && $currentKey == (clone $dueDate)->format('Y-m')) {
                     $group = &$groupedInstallments['current'];
                 } else {
                     if (!isset($baseGroup[$previousMonthKey])) {
