@@ -214,6 +214,27 @@ class PaymentController extends BaseController
         $payment->setStatus(0);
         $payment->setPaidAt(new DateTime());
 
+        $transaction = new Transaction();
+        $transaction->setPayment($payment);
+        $transaction->setAmount($totalPrice);
+        $transaction->setBankCode(' ');
+        $transaction->setBankTranNo(' ');
+        $transaction->setCardType(' ');
+        $transaction->setOrderInfo(' ');
+        $transaction->setPayDate((new DateTime())->format('YmdHis'));
+        $transaction->setResponseCode('00');
+        $transaction->setTmnCode(' ');
+        $transaction->setTransactionNo(' ');
+        $transaction->setTransactionStatus(' ');
+        $transaction->setTxnRef(' ');
+        $transaction->setSecureHash(' ');
+
+        $this->em->persist($transaction);
+
+        $this->em->persist($payment);
+
+        $this->em->persist($orderHistory);
+
         $this->spayLaterService->createInstallments($payment, $installmentCount);
 
         foreach ($cartItems as $cartItem) {

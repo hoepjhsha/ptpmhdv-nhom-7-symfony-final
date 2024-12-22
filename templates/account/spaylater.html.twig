@@ -31,9 +31,70 @@
 
                                         {% if groupedInstallments.current.installments is not empty %}
                                             <div class="button-items">
-                                                <form action="{{ url('account_payment_create') }}" method="post">
+                                                <form action="{{ url('account_payment_create') }}" method="post" class="d-flex justify-content-center align-items-center flex-row">
                                                     <input type="hidden" name="amount" value="{{ groupedInstallments.current.total_amount + groupedInstallments.current.total_fee + groupedInstallments.current.total_late_fee }}">
                                                     <button type="submit" class="btn btn-outline-primary">Pay</button>
+                                                    <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#currentModal"><h4><i class="fas fa-angle-right"></i></h4></button>
+
+                                                    <div class="modal fade" id="currentModal" tabindex="-1" role="dialog" aria-labelledby="currentModalTitle" aria-hidden="true">
+                                                        <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                                                            <div class="modal-content">
+                                                                <div class="modal-header">
+                                                                    <h6 class="modal-title m-0" id="currentModalTitle">Detail current</h6>
+                                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                </div><!--end modal-header-->
+                                                                <div class="modal-body">
+                                                                    <div class="row">
+                                                                        <div class="col-lg-12">
+                                                                            <div class="d-flex align-items-center flex-column justify-content-center">
+                                                                                <h3>{{ (groupedInstallments.current.total_amount + groupedInstallments.current.total_fee + groupedInstallments.current.total_late_fee ?? 0) | number_format(0, ',', '.') }} VNĐ</h3>
+                                                                                <h5 class="text-secondary">Payment period to 10th</h5>
+                                                                            </div>
+                                                                            <h4>Total principal: {{ groupedInstallments.current.total_amount | number_format(0, ',', '.') }} VNĐ</h4>
+                                                                            <h4>Installment conversion fee: {{ groupedInstallments.current.total_fee | number_format(0, ',', '.') }} VNĐ</h4>
+                                                                            <h4>Late Fee: {{ groupedInstallments.current.total_late_fee ?? 0 | number_format(0, ',', '.') }} VNĐ</h4>
+                                                                            <br>
+                                                                            <h4>Installments</h4>
+                                                                            <table class="table table-bordered table-centered table-nowrap">
+                                                                                <thead>
+                                                                                <tr>
+                                                                                    <th scope="col">Order</th>
+                                                                                    <th scope="col">No</th>
+                                                                                    <th scope="col">Principal</th>
+                                                                                    <th scope="col">Fee</th>
+                                                                                    <th scope="col">Late Fee</th>
+                                                                                    <th scope="col">Total</th>
+                                                                                </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                {% for installment in groupedInstallments.current.installments %}
+                                                                                    <tr>
+                                                                                        <td>
+                                                                                            {% for item in installment.payment.orderHistory.orderItems %}
+                                                                                                {{ item.item_name }},
+                                                                                            {% endfor %}
+                                                                                        </td>
+                                                                                        <td>
+                                                                                            {{ installment.installmentNo }}
+                                                                                        </td>
+                                                                                        <td>{{ installment.amount | number_format(0, ',', '.') }} VNĐ</td>
+                                                                                        <td>{{ installment.LaterFee | number_format(0, ',', '.') }} VNĐ</td>
+                                                                                        <td>{{ installment.LateFee | number_format(0, ',', '.') }} VNĐ</td>
+                                                                                        <td>{{ (installment.amount + installment.LaterFee + installment.LateFee) | number_format(0, ',', '.') }} VNĐ</td>
+                                                                                    </tr>
+                                                                                {% endfor %}
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </div>
+                                                                    </div><!--end row-->
+                                                                </div><!--end modal-body-->
+                                                                <div class="modal-footer">
+                                                                    <button type="button" class="btn btn-soft-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                                                                </div><!--end modal-footer-->
+                                                            </div><!--end modal-content-->
+                                                        </div><!--end modal-dialog-->
+                                                    </div><!--end modal-->
+
                                                 </form>
                                             </div>
                                         {% endif %}
@@ -47,7 +108,51 @@
                     <div class="card">
                         <div class="card-header d-flex align-items-center justify-content-between">
                             <h4 class="card-title">My bills</h4>
-                            <button class="btn btn-outline-primary">Transaction History</button>
+                            <button type="button" class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#transactionHistoryModal">
+                                Transaction History
+                            </button>
+
+                            <div class="modal fade" id="transactionHistoryModal" tabindex="-1" role="dialog" aria-labelledby="transactionHistoryModalTitle" aria-hidden="true">
+                                <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <h6 class="modal-title m-0" id="transactionHistoryModalTitle">Transaction History</h6>
+                                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                        </div><!--end modal-header-->
+                                        <div class="modal-body">
+                                            <div class="row">
+                                                <div class="col-lg-12">
+                                                    {% if transactions is not empty %}
+                                                        {% for transaction in transactions %}
+                                                            <div><h6 class="text-secondary">{{ transaction.label }}</h6></div>
+                                                            {% for transact in transaction.transactions %}
+                                                                <div class="card">
+                                                                    <div class="card-body d-flex flex-row align-items-center justify-content-between">
+                                                                        <div>
+                                                                            {% if transact.payment is not empty %}
+                                                                                <h6>Assign installments</h6>
+                                                                            {% else %}
+                                                                                <h6>Checkout installments</h6>
+                                                                            {% endif %}
+                                                                        </div>
+                                                                        <div class="d-flex flex-row align-items-center">
+                                                                            <h6 class="me-3">{% if transact.payment is not empty %}+{% else %}-{% endif %}{{ transact.amount | number_format(0, ',', '.') }} VNĐ</h6>
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            {% endfor %}
+                                                        {% endfor %}
+                                                    {% endif %}
+                                                </div>
+                                            </div><!--end row-->
+                                        </div><!--end modal-body-->
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-soft-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                                        </div><!--end modal-footer-->
+                                    </div><!--end modal-content-->
+                                </div><!--end modal-dialog-->
+                            </div><!--end modal-->
+
                         </div>
                         <div class="card-body">
 
@@ -75,11 +180,72 @@
                                                 <div class="card-body d-flex flex-row justify-content-between align-items-center">
                                                     <div>
                                                         <h4>{{ installment.label }}</h4>
-                                                        <h6 class="text-secondary">Payment period from 24th to 10th</h6>
+                                                        <h6 class="text-secondary">Payment period to 10th</h6>
                                                     </div>
                                                     <div class="d-flex">
                                                         <h4 class="me-3">{{ (installment.total_amount + installment.total_fee + installment.total_late_fee) | number_format(0, ',', '.') }} VNĐ</h4>
-                                                        <h4><i class="fas fa-angle-right" style="cursor: pointer"></i></h4>
+
+                                                        <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#unpaidModal{{ loop.index }}"><h4><i class="fas fa-angle-right"></i></h4></button>
+
+                                                        <div class="modal fade" id="unpaidModal{{ loop.index }}" tabindex="-1" role="dialog" aria-labelledby="unpaidModal{{ loop.index }}Title" aria-hidden="true">
+                                                            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h6 class="modal-title m-0" id="unpaidModal{{ loop.index }}Title">Detail next</h6>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                    </div><!--end modal-header-->
+                                                                    <div class="modal-body">
+                                                                        <div class="row">
+                                                                            <div class="col-lg-12">
+                                                                                <div class="d-flex align-items-center flex-column justify-content-center">
+                                                                                    <h3>{{ (installment.total_amount + installment.total_fee + installment.total_late_fee ?? 0) | number_format(0, ',', '.') }} VNĐ</h3>
+                                                                                    <h5 class="text-secondary">Payment period from 24th to 10th</h5>
+                                                                                </div>
+                                                                                <h4>Total principal: {{ installment.total_amount | number_format(0, ',', '.') }} VNĐ</h4>
+                                                                                <h4>Installment conversion fee: {{ installment.total_fee | number_format(0, ',', '.') }} VNĐ</h4>
+                                                                                <h4>Late Fee: {{ installment.total_late_fee ?? 0 | number_format(0, ',', '.') }} VNĐ</h4>
+                                                                                <br>
+                                                                                <h4>Installments</h4>
+                                                                                <table class="table table-bordered table-centered table-nowrap">
+                                                                                    <thead>
+                                                                                    <tr>
+                                                                                        <th scope="col">Order</th>
+                                                                                        <th scope="col">No</th>
+                                                                                        <th scope="col">Principal</th>
+                                                                                        <th scope="col">Fee</th>
+                                                                                        <th scope="col">Late Fee</th>
+                                                                                        <th scope="col">Total</th>
+                                                                                    </tr>
+                                                                                    </thead>
+                                                                                    <tbody>
+                                                                                    {% for install in installment.installments %}
+                                                                                        <tr>
+                                                                                            <td>
+                                                                                                {% for item in install.payment.orderHistory.orderItems %}
+                                                                                                    {{ item.item_name }},
+                                                                                                {% endfor %}
+                                                                                            </td>
+                                                                                            <td>
+                                                                                                {{ install.installmentNo }}
+                                                                                            </td>
+                                                                                            <td>{{ install.amount | number_format(0, ',', '.') }} VNĐ</td>
+                                                                                            <td>{{ install.LaterFee | number_format(0, ',', '.') }} VNĐ</td>
+                                                                                            <td>{{ install.LateFee | number_format(0, ',', '.') }} VNĐ</td>
+                                                                                            <td>{{ (install.amount + install.LaterFee + install.LateFee) | number_format(0, ',', '.') }} VNĐ</td>
+                                                                                        </tr>
+                                                                                    {% endfor %}
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </div>
+                                                                        </div><!--end row-->
+                                                                    </div><!--end modal-body-->
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-soft-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                                                                    </div><!--end modal-footer-->
+                                                                </div><!--end modal-content-->
+                                                            </div><!--end modal-dialog-->
+                                                        </div><!--end modal-->
+
                                                     </div>
                                                 </div>
                                             </div>
@@ -101,7 +267,68 @@
                                                     </div>
                                                     <div class="d-flex">
                                                         <h4 class="me-3">{{ (installment.total_amount + installment.total_fee + installment.total_late_fee) | number_format(0, ',', '.') }} VNĐ</h4>
-                                                        <h4><i class="fas fa-angle-right" style="cursor: pointer"></i></h4>
+
+                                                        <button type="button" class="btn" data-bs-toggle="modal" data-bs-target="#paidModal{{ loop.index }}"><h4><i class="fas fa-angle-right"></i></h4></button>
+
+                                                        <div class="modal fade" id="paidModal{{ loop.index }}" tabindex="-1" role="dialog" aria-labelledby="paidModal{{ loop.index }}Title" aria-hidden="true">
+                                                            <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+                                                                <div class="modal-content">
+                                                                    <div class="modal-header">
+                                                                        <h6 class="modal-title m-0" id="paidModal{{ loop.index }}Title">Detail paid</h6>
+                                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                                    </div><!--end modal-header-->
+                                                                    <div class="modal-body">
+                                                                        <div class="row">
+                                                                            <div class="col-lg-12">
+                                                                                <div class="d-flex align-items-center flex-column justify-content-center">
+                                                                                    <h3>{{ (installment.total_amount + installment.total_fee + installment.total_late_fee ?? 0) | number_format(0, ',', '.') }} VNĐ</h3>
+                                                                                    <h5 class="text-secondary">Payment period from 24th to 10th</h5>
+                                                                                </div>
+                                                                                <h4>Total principal: {{ installment.total_amount | number_format(0, ',', '.') }} VNĐ</h4>
+                                                                                <h4>Installment conversion fee: {{ installment.total_fee | number_format(0, ',', '.') }} VNĐ</h4>
+                                                                                <h4>Late Fee: {{ installment.total_late_fee ?? 0 | number_format(0, ',', '.') }} VNĐ</h4>
+                                                                                <br>
+                                                                                <h4>Installments</h4>
+                                                                                <table class="table table-bordered table-centered table-nowrap">
+                                                                                    <thead>
+                                                                                    <tr>
+                                                                                        <th scope="col">Order</th>
+                                                                                        <th scope="col">No</th>
+                                                                                        <th scope="col">Principal</th>
+                                                                                        <th scope="col">Fee</th>
+                                                                                        <th scope="col">Late Fee</th>
+                                                                                        <th scope="col">Total</th>
+                                                                                    </tr>
+                                                                                    </thead>
+                                                                                    <tbody>
+                                                                                    {% for install in installment.installments %}
+                                                                                        <tr>
+                                                                                            <td>
+                                                                                                {% for item in install.payment.orderHistory.orderItems %}
+                                                                                                    {{ item.item_name }},
+                                                                                                {% endfor %}
+                                                                                            </td>
+                                                                                            <td>
+                                                                                                {{ install.installmentNo }}
+                                                                                            </td>
+                                                                                            <td>{{ install.amount | number_format(0, ',', '.') }} VNĐ</td>
+                                                                                            <td>{{ install.LaterFee | number_format(0, ',', '.') }} VNĐ</td>
+                                                                                            <td>{{ install.LateFee | number_format(0, ',', '.') }} VNĐ</td>
+                                                                                            <td>{{ (install.amount + install.LaterFee + install.LateFee) | number_format(0, ',', '.') }} VNĐ</td>
+                                                                                        </tr>
+                                                                                    {% endfor %}
+                                                                                    </tbody>
+                                                                                </table>
+                                                                            </div>
+                                                                        </div><!--end row-->
+                                                                    </div><!--end modal-body-->
+                                                                    <div class="modal-footer">
+                                                                        <button type="button" class="btn btn-soft-secondary btn-sm" data-bs-dismiss="modal">Close</button>
+                                                                    </div><!--end modal-footer-->
+                                                                </div><!--end modal-content-->
+                                                            </div><!--end modal-dialog-->
+                                                        </div><!--end modal-->
+
                                                     </div>
                                                 </div>
                                             </div>

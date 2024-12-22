@@ -21,6 +21,7 @@ use DateTime;
 use DateTimeInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
@@ -64,6 +65,7 @@ class SpayLaterController extends BaseController
         return $this->render('account/spaylater.html.twig', [
             'page_title' => 'Spay Later',
             'groupedInstallments' => $this->splitGroupByMonthYear($installments),
+            'transactions' => $this->getTransactionHistory(),
         ]);
     }
 
@@ -112,10 +114,6 @@ class SpayLaterController extends BaseController
                 if (!$user instanceof User) {
                     return $this->redirectToRoute('app_login');
                 }
-
-//                $user->setCreditLimit($user->getCreditLimit() + 72000);
-//
-//                dd($user->getCreditLimit());
 
                 $transaction = new Transaction();
                 $transaction->setAmount($data['vnp_Amount']);
@@ -253,5 +251,58 @@ class SpayLaterController extends BaseController
         }
 
         return $groupedInstallments;
+    }
+
+    private function getTransactionHistory(): RedirectResponse|array
+    {
+        $user = $this->security->getUser();
+        if (! $user instanceof User) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $transactions = [];
+
+        $orderHistories = $this->em->getRepository(OrderHistory::class)->findBy(['user' => $user, 'status' => 2]);
+        $payments = [];
+        foreach ($orderHistories as $orderHistory) {
+            if (! $orderHistory instanceof OrderHistory) {
+                continue;
+            }
+            if (! $orderHistory->getPayment() instanceof Payment) {
+                continue;
+            }
+            if ($orderHistory->getPayment()->getPaymentMethod() != 2) {
+                continue;
+            }
+            $payments[] = $orderHistory->getPayment();
+        }
+
+        foreach ($payments as $payment) {
+            $transaction = $payment->getTransaction();
+            $date = $transaction->getPayDate();
+            $datekey = \DateTime::createFromFormat('YmdHis', $date)->format('Y-m');
+            $dateLabel = \DateTime::createFromFormat('YmdHis', $date)->format('F Y');
+            $transactions[$datekey] = [
+                'label' => $dateLabel,
+                'transactions' => []
+            ];
+            $transactions[$datekey]['transactions'][] = $transaction;
+
+            foreach ($payment->getInstallments() as $installment) {
+                if ($installment->isPaid()) {
+                    $dtKey = \DateTime::createFromFormat('YmdHis', $installment->getTransact()->getPayDate())->format('Y-m');
+                    $dateLabel = \DateTime::createFromFormat('YmdHis', $installment->getTransact()->getPayDate())->format('F Y');
+                    $transactions[$dtKey] = [
+                        'label' => $dateLabel,
+                        'transactions' => []
+                    ];
+                    if (!in_array($installment->getTransact(), $transactions[$dtKey]['transactions'])) {
+                        $transactions[$dtKey]['transactions'][] = $installment->getTransact();
+                    }
+                }
+            }
+        }
+
+        return $transactions ?? [];
     }
 }
