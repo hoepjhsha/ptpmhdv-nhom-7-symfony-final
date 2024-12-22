@@ -2,64 +2,63 @@
 
 namespace App\Repository;
 
-use App\Entity\Order;
+use App\Entity\Cart;
 use App\Entity\User;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<Order>
+ * @extends ServiceEntityRepository<Cart>
  */
-class OrderRepository extends ServiceEntityRepository
+class CartRepository extends ServiceEntityRepository
 {
     private EntityManagerInterface $entityManager;
 
     public function __construct(ManagerRegistry $registry, EntityManagerInterface $entityManager)
     {
-        parent::__construct($registry, Order::class);
+        parent::__construct($registry, Cart::class);
         $this->entityManager = $entityManager;
     }
 
     /**
      * Get or create an order for the user
      */
-    public function getOrCreateOrderForUser(User $user): Order
+    public function getOrCreateCartForUser(User $user): Cart
     {
         // Check if the user already has an order
-        $order = $this->createQueryBuilder('o')
+        $cart = $this->createQueryBuilder('o')
             ->andWhere('o.user = :user')
             ->setParameter('user', $user)
             ->getQuery()
             ->getOneOrNullResult();
 
         // If no order exists, create a new one
-        if (!$order) {
-            $order = new Order();
-            $order->setUser($user);
-            $order->setCreatedAt(new \DateTime());
-            $order->setUpdatedAt(new \DateTime());
+        if (!$cart) {
+            $cart = new Cart();
+            $cart->setUser($user);
+            $cart->setCreatedAt(new DateTime());
+            $cart->setUpdatedAt(new DateTime());
 
-            // Persist the new order
-            $this->entityManager->persist($order);
+            $this->entityManager->persist($cart);
             $this->entityManager->flush();
         }
 
-//        return $order;
 
         return $this->createQueryBuilder('o')
-            ->leftJoin('o.orderItems', 'oi')
+            ->leftJoin('o.cartItems', 'oi')
             ->addSelect('oi')
             ->leftJoin('oi.item', 'item')
             ->addSelect('item')
             ->where('o.id = :id')
-            ->setParameter('id', $order->getId())
+            ->setParameter('id', $cart->getId())
             ->getQuery()
             ->getOneOrNullResult();
     }
 
     //    /**
-    //     * @return Order[] Returns an array of Order objects
+    //     * @return Cart[] Returns an array of Cart objects
     //     */
     //    public function findByExampleField($value): array
     //    {
@@ -73,7 +72,7 @@ class OrderRepository extends ServiceEntityRepository
     //        ;
     //    }
 
-    //    public function findOneBySomeField($value): ?Order
+    //    public function findOneBySomeField($value): ?Cart
     //    {
     //        return $this->createQueryBuilder('o')
     //            ->andWhere('o.exampleField = :val')

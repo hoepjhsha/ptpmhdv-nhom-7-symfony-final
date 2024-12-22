@@ -34,7 +34,7 @@ class DashboardController extends BaseController
         foreach ($orderHistories as $orderHistory) {
             $chartData[] = [
                 'date' => $orderHistory->getCreatedAt()->format('Y-m-d'),
-                'value' => $orderHistory->getTotalPrice()
+                'value' => $orderHistory->getTotalAmount()
             ];
         }
 

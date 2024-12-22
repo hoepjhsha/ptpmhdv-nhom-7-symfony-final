@@ -49,7 +49,7 @@ class ItemApi extends BaseController
         $items = $this->itemRepository->findAll();
         $data = [];
 
-        foreach ($items as $key => $item) {
+        foreach ($items as $item) {
             $data[] = [
                 'id'      => $item->getId(),
                 'code' => $item->getItemCode(),
@@ -104,7 +104,7 @@ class ItemApi extends BaseController
         $items = $this->itemRepository->findAll();
         $data = [];
 
-        foreach ($items as $key => $item) {
+        foreach ($items as $item) {
             $data[] = [
                 'id'      => $item->getId(),
                 'code' => $item->getItemCode(),

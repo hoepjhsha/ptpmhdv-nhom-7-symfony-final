@@ -3,11 +3,12 @@
 namespace App\Entity;
 
 use App\Repository\ItemRepository;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: ItemRepository::class)]
 #[ORM\Table(name: 'items')]
@@ -27,7 +28,7 @@ class Item
     #[ORM\Column(type: Types::DECIMAL, precision: 65, scale: 2)]
     private ?string $item_price = null;
 
-    #[ORM\ManyToOne(targetEntity: Category::class, inversedBy: 'items')]
+    #[ORM\ManyToOne(targetEntity: Category::class, cascade: ['persist', 'remove'], inversedBy: 'items')]
     #[ORM\JoinColumn(name: 'item_category_id', referencedColumnName: 'id', nullable: false, onDelete: 'CASCADE')]
     private ?Category $category = null;
 
@@ -37,15 +38,23 @@ class Item
     #[ORM\Column(type: TYPES::TEXT, nullable: true)]
     private ?string $item_description = null;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?DateTimeInterface $created_at;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?DateTimeInterface $updated_at;
+
     /**
-     * @var Collection<int, OrderItem>
+     * @var Collection<int, CartItem>
      */
-    #[ORM\OneToMany(targetEntity: OrderItem::class, mappedBy: 'item', orphanRemoval: true)]
-    private Collection $orderItems;
+    #[ORM\OneToMany(targetEntity: CartItem::class, mappedBy: 'item', orphanRemoval: true)]
+    private Collection $cartItems;
 
     public function __construct()
     {
-        $this->orderItems = new ArrayCollection();
+        $this->cartItems = new ArrayCollection();
+        $this->created_at = new DateTime();
+        $this->updated_at = new DateTime();
     }
 
     public function getId(): ?int
@@ -132,29 +141,49 @@ class Item
         return $this;
     }
 
-    /**
-     * @return Collection<int, OrderItem>
-     */
-    public function getOrderItems(): Collection
+    public function getCreatedAt(): ?DateTimeInterface
     {
-        return $this->orderItems;
+        return $this->created_at;
     }
 
-    public function addOrderItem(OrderItem $orderItem): static
+    public function setCreatedAt(?DateTimeInterface $created_at): void
     {
-        if (!$this->orderItems->contains($orderItem)) {
-            $this->orderItems->add($orderItem);
-            $orderItem->setItem($this);
+        $this->created_at = $created_at;
+    }
+
+    public function getUpdatedAt(): ?DateTimeInterface
+    {
+        return $this->updated_at;
+    }
+
+    public function setUpdatedAt(?DateTimeInterface $updated_at): void
+    {
+        $this->updated_at = $updated_at;
+    }
+
+    /**
+     * @return Collection<int, CartItem>
+     */
+    public function getCartItems(): Collection
+    {
+        return $this->cartItems;
+    }
+
+    public function addCartItem(CartItem $cartItem): static
+    {
+        if (!$this->cartItems->contains($cartItem)) {
+            $this->cartItems->add($cartItem);
+            $cartItem->setItem($this);
         }
 
         return $this;
     }
 
-    public function removeOrderItem(OrderItem $orderItem): static
+    public function removeCartItem(CartItem $cartItem): static
     {
-        if ($this->orderItems->removeElement($orderItem)) {
-            if ($orderItem->getItem() === $this) {
-                $orderItem->setItem(null);
+        if ($this->cartItems->removeElement($cartItem)) {
+            if ($cartItem->getItem() === $this) {
+                $cartItem->setItem(null);
             }
         }
 

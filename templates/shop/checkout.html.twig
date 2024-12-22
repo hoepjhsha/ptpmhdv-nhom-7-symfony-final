@@ -18,19 +18,19 @@
                             </tr>
                             </thead>
                             <tbody>
-                            {% if orderItems is not null %}
-                                {% for orderItem in orderItems %}
+                            {% if cartItems is not null %}
+                                {% for cartItem in cartItems %}
                                     <tr>
                                         <td>
                                             <p class="d-inline-block align-middle mb-0">
-                                                <a href="{{ url('shop_view', {id: orderItem.item.id}) }}" class="d-inline-block align-middle mb-0 product-name">{{ orderItem.item.itemName }}</a>
+                                                <a href="{{ url('shop_view', {id: cartItem.item.id}) }}" class="d-inline-block align-middle mb-0 product-name">{{ cartItem.item.itemName }}</a>
                                                 <br>
                                             </p>
                                         </td>
                                         <td>
-                                            {{ orderItem.quantity }}
+                                            {{ cartItem.quantity }}
                                         </td>
-                                        <td>{{ (orderItem.item.itemPrice * orderItem.quantity) | number_format(0, ',', '.') }} VND</td>
+                                        <td>{{ (cartItem.item.itemPrice * cartItem.quantity) | number_format(0, ',', '.') }} VND</td>
                                     </tr>
                                 {% endfor %}
                             {% endif %}
@@ -71,6 +71,22 @@
                     <form action="{{ url('payment_create') }}" method="post">
                         <input type="hidden" name="amount" value="{{ totalMoney }}">
                         <button type="submit" class="btn w-100 btn-soft-primary">Place Your Order</button>
+                    </form>
+
+                    <form action="{{ url('installment_create') }}" method="post" class="d-flex  mt-3">
+                        <input type="hidden" name="amount" value="{{ totalMoney }}">
+                        <div class="col-3">
+                            <select class="form-select" id="inlineFormSelectPref" name="installmentCount">
+                                <option value="1">One</option>
+                                <option value="2">Two</option>
+                                <option value="3">Three</option>
+                                <option value="6">Six</option>
+                                <option value="12">Twelve</option>
+                            </select>
+                        </div>
+                        <div class="col-9">
+                            <button type="submit" class="btn w-100 btn-soft-primary">Place by Spay Later</button>
+                        </div>
                     </form>
                 </div><!--end card-body-->
             </div><!--end card-->

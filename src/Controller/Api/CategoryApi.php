@@ -49,7 +49,7 @@ class CategoryApi extends BaseController
         $categories = $this->categoryRepository->findAll();
         $data = [];
 
-        foreach ($categories as $key => $category) {
+        foreach ($categories as $category) {
             $data[] = [
                 'id'      => $category->getId(),
                 'name' => $category->getCategoryName(),

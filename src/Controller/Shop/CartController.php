@@ -11,11 +11,10 @@ namespace App\Controller\Shop;
 
 use App\Controller\BaseController;
 use App\Entity\Item;
-use App\Entity\Order;
-use App\Entity\OrderItem;
+use App\Entity\CartItem;
 use App\Entity\User;
-use App\Repository\OrderItemRepository;
-use App\Repository\OrderRepository;
+use App\Repository\CartItemRepository;
+use App\Repository\CartRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,14 +25,14 @@ use Symfony\Component\Routing\Attribute\Route;
 class CartController extends BaseController
 {
     private EntityManagerInterface $em;
-    private OrderRepository $orderRepository;
-    private OrderItemRepository $orderItemRepository;
+    private CartRepository $cartRepository;
+    private CartItemRepository $cartItemRepository;
     private Security $security;
 
-    public function __construct(OrderRepository $orderRepository, OrderItemRepository $orderItemRepository, Security $security, EntityManagerInterface $em)
+    public function __construct(CartRepository $cartRepository, CartItemRepository $cartItemRepository, Security $security, EntityManagerInterface $em)
     {
-        $this->orderRepository = $orderRepository;
-        $this->orderItemRepository = $orderItemRepository;
+        $this->cartRepository = $cartRepository;
+        $this->cartItemRepository = $cartItemRepository;
         $this->security = $security;
         $this->em = $em;
     }
@@ -56,17 +55,18 @@ class CartController extends BaseController
             return $this->redirectToRoute('shop_list');
         }
 
-        $order = $this->orderRepository->getOrCreateOrderForUser($user);
-        $orderItem = $this->orderItemRepository->findOneBy(['order' => $order, 'item' => $item]);
+        $cart = $this->cartRepository->getOrCreateCartForUser($user);
+        $cartItem = $this->cartItemRepository->findOneBy(['cart' => $cart, 'item' => $item]);
 
-        if ($orderItem) {
-            $orderItem->setQuantity($orderItem->getQuantity() + $quantity);
+        if ($cartItem) {
+            $cartItem->setQuantity($cartItem->getQuantity() + $quantity);
         } else {
-            $orderItem = new OrderItem();
-            $orderItem->setOrder($order);
-            $orderItem->setItem($item);
-            $orderItem->setQuantity($quantity);
-            $this->em->persist($orderItem);
+            $cartItem = new CartItem();
+            $cartItem->setCart($cart);
+            $cartItem->setItem($item);
+            $cartItem->setQuantity($quantity);
+
+            $this->em->persist($cartItem);
         }
         $this->em->flush();
 
@@ -83,14 +83,13 @@ class CartController extends BaseController
             return $this->redirectToRoute('app_login');
         }
 
-        $itemId = $request->request->get($id);
         $item = $this->em->getRepository(Item::class)->find($id);
 
-        $order = $this->orderRepository->getOrCreateOrderForUser($user);
-        $orderItem = $this->orderItemRepository->findOneBy(['order' => $order, 'item' => $item]);
+        $cart = $this->cartRepository->getOrCreateCartForUser($user);
+        $cartItem = $this->cartItemRepository->findOneBy(['cart' => $cart, 'item' => $item]);
 
-        if ($orderItem) {
-            $this->em->remove($orderItem);
+        if ($cartItem) {
+            $this->em->remove($cartItem);
             $this->em->flush();
         }
 
@@ -105,15 +104,14 @@ class CartController extends BaseController
             return $this->redirectToRoute('app_login');
         }
 
-        $order = $this->orderRepository->getOrCreateOrderForUser($user);
-
         $quantities = $request->request->all('quantity');
 
-        foreach ($quantities as $orderItemId => $quantity) {
-            $orderItem = $this->orderItemRepository->find($orderItemId);
-            if ($orderItem) {
-                $orderItem->setQuantity((int)$quantity);
-                $this->em->persist($orderItem);
+        foreach ($quantities as $cartItemId => $quantity) {
+            $cartItem = $this->cartItemRepository->find($cartItemId);
+            if ($cartItem) {
+                $cartItem->setQuantity((int)$quantity);
+
+                $this->em->persist($cartItem);
             }
         }
 
@@ -130,12 +128,12 @@ class CartController extends BaseController
             return $this->redirectToRoute('app_login');
         }
 
-        $order = $this->orderRepository->getOrCreateOrderForUser($user);
-        $orderItems = $order->getOrderItems();
+        $cart = $this->cartRepository->getOrCreateCartForUser($user);
+        $cartItems = $cart->getCartItems();
 
         $data = [];
-        foreach ($orderItems as $orderItem) {
-            $data[] = $orderItem;
+        foreach ($cartItems as $cartItem) {
+            $data[] = $cartItem;
         }
 
         $totalMoney = 0;
@@ -145,20 +143,8 @@ class CartController extends BaseController
 
         return $this->render('shop/cart.html.twig', [
             'page_title' => 'Cart',
-            'orderItems' => $data,
+            'cartItems' => $data,
             'totalMoney' => $totalMoney,
         ]);
-    }
-
-    private function getOrder(): Order|Response
-    {
-        /** @var User $user */
-        $user = $this->security->getUser();
-
-        if (!$user) {
-            return new Response('User not logged in', Response::HTTP_UNAUTHORIZED);
-        }
-
-        return $this->orderRepository->getOrCreateOrderForUser($user);
     }
 }

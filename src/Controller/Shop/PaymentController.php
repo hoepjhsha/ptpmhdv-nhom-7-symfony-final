@@ -11,10 +11,14 @@ namespace App\Controller\Shop;
 
 use App\Controller\BaseController;
 use App\Entity\OrderHistory;
+use App\Entity\Payment;
 use App\Entity\Transaction;
 use App\Entity\User;
-use App\Repository\OrderRepository;
+use App\Repository\CartRepository;
+use App\Services\SpayLaterService;
 use App\Services\VNPayService;
+use DateMalformedStringException;
+use DateTime;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\SecurityBundle\Security;
 use Symfony\Component\HttpFoundation\Request;
@@ -26,16 +30,18 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 class PaymentController extends BaseController
 {
     private VNPayService $vnpService;
+    private SpayLaterService $spayLaterService;
     private Security $security;
     private EntityManagerInterface $em;
-    private OrderRepository $orderRepository;
+    private CartRepository $cartRepository;
 
-    public function __construct(VNPayService $vnpService, Security $security, EntityManagerInterface $em, OrderRepository $orderRepository)
+    public function __construct(VNPayService $vnpService, SpayLaterService $spayLaterService, Security $security, EntityManagerInterface $em, CartRepository $cartRepository)
     {
         $this->vnpService = $vnpService;
+        $this->spayLaterService = $spayLaterService;
         $this->security = $security;
         $this->em = $em;
-        $this->orderRepository = $orderRepository;
+        $this->cartRepository = $cartRepository;
     }
 
     #[Route('/payment/create', name: 'payment_create', methods: ['POST'])]
@@ -82,21 +88,19 @@ class PaymentController extends BaseController
                     return $this->redirectToRoute('app_login');
                 }
 
-                $order = $this->orderRepository->getOrCreateOrderForUser($user);
-
-                $order = $this->orderRepository->findOneBy(['user' => $user]);
-                if (!$order) {
+                $cart = $this->cartRepository->findOneBy(['user' => $user]);
+                if (!$cart) {
                     $this->addFlash('error', 'Your cart is empty.');
                     return $this->redirectToRoute('shop_cart');
                 }
 
                 $totalPrice = 0;
-                $orderItems = $order->getOrderItems();
+                $cartItems = $cart->getCartItems();
 
                 $itemsSummary = [];
-                foreach ($orderItems as $orderItem) {
-                    $item = $orderItem->getItem();
-                    $quantity = $orderItem->getQuantity();
+                foreach ($cartItems as $cartItem) {
+                    $item = $cartItem->getItem();
+                    $quantity = $cartItem->getQuantity();
                     $price = $item->getItemPrice();
                     $totalPrice += $price * $quantity;
 
@@ -110,11 +114,17 @@ class PaymentController extends BaseController
                 $orderHistory = new OrderHistory();
                 $orderHistory->setUser($user);
                 $orderHistory->setOrderItems($itemsSummary);
-                $orderHistory->setTotalPrice($totalPrice);
-                $orderHistory->setPaymentType(1);
-                $orderHistory->setCreatedAt(new \DateTime());
+                $orderHistory->setTotalAmount($totalPrice);
+                $orderHistory->setCreatedAt(new DateTime());
+
+                $payment = new Payment();
+                $payment->setOrderHistory($orderHistory);
+                $payment->setPaymentMethod(1);
+                $payment->setStatus(1);
+                $payment->setPaidAt(new DateTime());
 
                 $transaction = new Transaction();
+                $transaction->setPayment($payment);
                 $transaction->setAmount($data['vnp_Amount']);
                 $transaction->setBankCode($data['vnp_BankCode']);
                 $transaction->setBankTranNo($data['vnp_BankTranNo']);
@@ -129,15 +139,20 @@ class PaymentController extends BaseController
                 $transaction->setSecureHash($vnpSecureHash);
 
                 $this->em->persist($transaction);
-                $orderHistory->setTransact($transaction);
+
+                $payment->setTransaction($transaction);
+
+                $this->em->persist($payment);
+
+                $orderHistory->setPayment($payment);
 
                 $this->em->persist($orderHistory);
 
-                foreach ($orderItems as $orderItem) {
-                    $this->em->remove($orderItem);
+                foreach ($cartItems as $cartItem) {
+                    $this->em->remove($cartItem);
                 }
 
-                $this->em->persist($order);
+                $this->em->persist($cart);
 
                 $this->em->flush();
 
@@ -148,6 +163,91 @@ class PaymentController extends BaseController
         } else {
             $this->addFlash('error', 'Invalid signature');
         }
+
+        return $this->redirectToRoute('shop_cart');
+    }
+
+    /**
+     * @throws DateMalformedStringException
+     */
+    #[Route(path: 'installment/create', name: 'installment_create', methods: ['POST'])]
+    public function createInstallments(Request $request): Response
+    {
+        $installmentCount = $request->request->get('installmentCount');
+
+        $user = $this->security->getUser();
+        if (!$user instanceof User) {
+            return $this->redirectToRoute('app_login');
+        }
+
+        $cart = $this->cartRepository->findOneBy(['user' => $user]);
+        if (!$cart) {
+            $this->addFlash('error', 'Your cart is empty.');
+            return $this->redirectToRoute('shop_cart');
+        }
+
+        $totalPrice = 0;
+        $cartItems = $cart->getCartItems();
+        $itemsSummary = [];
+
+        foreach ($cartItems as $cartItem) {
+            $item = $cartItem->getItem();
+            $quantity = $cartItem->getQuantity();
+            $price = $item->getItemPrice();
+            $totalPrice += $price * $quantity;
+            $itemsSummary[] = [
+                'item_name' => $item->getItemName(),
+                'quantity' => $quantity,
+                'price' => $price,
+            ];
+        }
+
+        $orderHistory = new OrderHistory();
+        $orderHistory->setUser($user);
+        $orderHistory->setOrderItems($itemsSummary);
+        $orderHistory->setTotalAmount($totalPrice);
+        $orderHistory->setCreatedAt(new DateTime());
+
+        $payment = new Payment();
+        $payment->setOrderHistory($orderHistory);
+        $payment->setPaymentMethod(2);
+        $payment->setStatus(0);
+        $payment->setPaidAt(new DateTime());
+
+        $transaction = new Transaction();
+        $transaction->setPayment($payment);
+        $transaction->setAmount($totalPrice);
+        $transaction->setBankCode(' ');
+        $transaction->setBankTranNo(' ');
+        $transaction->setCardType(' ');
+        $transaction->setOrderInfo(' ');
+        $transaction->setPayDate((new DateTime())->format('YmdHis'));
+        $transaction->setResponseCode('00');
+        $transaction->setTmnCode(' ');
+        $transaction->setTransactionNo(' ');
+        $transaction->setTransactionStatus(' ');
+        $transaction->setTxnRef(' ');
+        $transaction->setSecureHash(' ');
+
+        $this->em->persist($transaction);
+
+        $this->em->persist($payment);
+
+        $this->em->persist($orderHistory);
+
+        $this->spayLaterService->createInstallments($payment, $installmentCount);
+
+        foreach ($cartItems as $cartItem) {
+            $this->em->remove($cartItem);
+        }
+
+        $this->em->persist($cart);
+
+        $user->setCreditLimit($user->getCreditLimit() - $totalPrice);
+
+        $this->em->flush();
+
+        $this->addFlash('success','Create installments successfully.');
 
         return $this->redirectToRoute('shop_cart');
     }

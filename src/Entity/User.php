@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use DateTime;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -27,7 +29,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      * @var list<string> The user roles
      */
     #[ORM\Column]
-    private array $roles = [];
+    private array $roles;
 
     /**
      * @var ?string The hashed password
@@ -36,32 +38,33 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $password = null;
 
     #[ORM\Column(type: Types::SMALLINT)]
-    private ?int $status = null;
+    private ?int $status;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $last_login_at = null;
-
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $created_at = null;
+    #[ORM\Column(type: Types::DECIMAL, precision: 65, scale: 2)]
+    private ?string $credit_limit;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
-    private ?\DateTimeInterface $updated_at = null;
+    private ?DateTimeInterface $created_at;
 
-    #[ORM\OneToOne(mappedBy: 'user', cascade: ['persist', 'remove'])]
-    private ?Order $orders = null;
+    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    private ?DateTimeInterface $updated_at;
+
+    #[ORM\OneToOne(targetEntity: Cart::class, mappedBy: 'user', cascade: ['persist', 'remove'])]
+    private ?Cart $cart = null;
 
     /**
      * @var Collection<int, OrderHistory>
      */
-    #[ORM\OneToMany(targetEntity: OrderHistory::class, mappedBy: 'user_id', orphanRemoval: true)]
+    #[ORM\OneToMany(targetEntity: OrderHistory::class, mappedBy: 'user', orphanRemoval: true)]
     private Collection $orderHistories;
 
     public function __construct()
     {
         $this->roles = ['ROLE_USER'];
         $this->status = 1;
-        $this->created_at = new \DateTime();
-        $this->updated_at = new \DateTime();
+        $this->credit_limit = '11000000.00';
+        $this->created_at = new DateTime();
+        $this->updated_at = new DateTime();
         $this->orderHistories = new ArrayCollection();
     }
 
@@ -99,11 +102,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     public function getRoles(): array
     {
-        $roles = $this->roles;
-        // guarantee every user at least has ROLE_USER
-        $roles[] = 'ROLE_USER';
-
-        return array_unique($roles);
+        return array_unique($this->roles);
     }
 
     /**
@@ -152,55 +151,52 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getLastLoginAt(): ?\DateTimeInterface
+    public function getCreditLimit(): ?string
     {
-        return $this->last_login_at;
+        return $this->credit_limit;
     }
 
-    public function setLastLoginAt(?\DateTimeInterface $last_login_at): static
+    public function setCreditLimit(?string $credit_limit): void
     {
-        $this->last_login_at = $last_login_at;
-
-        return $this;
+        $this->credit_limit = $credit_limit;
     }
 
-    public function getCreatedAt(): ?\DateTimeInterface
+    public function getCreatedAt(): ?DateTimeInterface
     {
         return $this->created_at;
     }
 
-    public function setCreatedAt(\DateTimeInterface $created_at): static
+    public function setCreatedAt(DateTimeInterface $created_at): static
     {
         $this->created_at = $created_at;
 
         return $this;
     }
 
-    public function getUpdatedAt(): ?\DateTimeInterface
+    public function getUpdatedAt(): ?DateTimeInterface
     {
         return $this->updated_at;
     }
 
-    public function setUpdatedAt(\DateTimeInterface $updated_at): static
+    public function setUpdatedAt(DateTimeInterface $updated_at): static
     {
         $this->updated_at = $updated_at;
 
         return $this;
     }
 
-    public function getOrders(): ?Order
+    public function getCart(): ?Cart
     {
-        return $this->orders;
+        return $this->cart;
     }
 
-    public function setOrders(Order $orders): static
+    public function setCart(Cart $cart): static
     {
-        // set the owning side of the relation if necessary
-        if ($orders->getUser() !== $this) {
-            $orders->setUser($this);
+        if ($cart->getUser() !== $this) {
+            $cart->setUser($this);
         }
 
-        $this->orders = $orders;
+        $this->cart = $cart;
 
         return $this;
     }

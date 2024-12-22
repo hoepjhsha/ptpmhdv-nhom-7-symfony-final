@@ -18,7 +18,7 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 #[Route(path: '/account', name: 'account_')]
 #[IsGranted('ROLE_USER')]
-class UserOrderControler extends BaseController
+class UserOrderController extends BaseController
 {
     private EntityManagerInterface $em;
 
@@ -32,8 +32,6 @@ class UserOrderControler extends BaseController
     {
         $orders = $this->getJsonArray('http://dastonehdv.local' . $this->generateUrl('api_user_order_list') . '?user_id=' . $this->getUser()->getId());
 
-//        dd($orders);
-
         return $this->render('account/user_order.html.twig', [
             'page_title' => "User's Orders",
             'orderItems' => $orders,
@@ -45,10 +43,8 @@ class UserOrderControler extends BaseController
     {
         $order = $this->em->getRepository(OrderHistory::class)->find($id);
 
-//        dd($order->getStatus() != 0);
-
         if ($order->getStatus() != 1 && $order->getStatus() != 0) {
-            $this->addFlash('error', 'Order can not be canceled!');
+            $this->addFlash('error', 'Cart can not be canceled!');
             return $this->redirectToRoute('account_order');
         }
 
@@ -56,7 +52,7 @@ class UserOrderControler extends BaseController
         $this->em->persist($order);
         $this->em->flush();
 
-        $this->addFlash('success', 'Order has been canceled successfully!');
+        $this->addFlash('success', 'Cart has been canceled successfully!');
         return $this->redirectToRoute('account_order');
     }
 

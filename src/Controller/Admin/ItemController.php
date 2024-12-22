@@ -15,6 +15,7 @@ use App\Repository\CategoryRepository;
 use App\Repository\ItemRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
+use Exception;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\MoneyType;
 use Symfony\Component\Form\Extension\Core\Type\SubmitType;
@@ -147,7 +148,7 @@ class ItemController extends BaseController
                     $this->em->flush();
 
                     $this->addFlash('success', 'Add new item successfully');
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     $this->addFlash('error', $e->getMessage());
                 }
 
@@ -231,7 +232,7 @@ class ItemController extends BaseController
                     $this->em->flush();
 
                     $this->addFlash('success', 'Update item successfully');
-                } catch (\Exception $e) {
+                } catch (Exception $e) {
                     $this->addFlash('error', $e->getMessage());
                 }
 
@@ -261,7 +262,7 @@ class ItemController extends BaseController
             $this->em->flush();
 
             $this->addFlash('success', 'Delete item successfully');
-        } catch (\Exception $e) {
+        } catch (Exception $e) {
             $this->addFlash('error', $e->getMessage());
         }
 

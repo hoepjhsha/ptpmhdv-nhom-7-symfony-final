@@ -6,13 +6,21 @@ use App\Repository\TransactionRepository;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TransactionRepository::class)]
-#[ORM\Table(name: '`transaction`')]
+#[ORM\Table(name: 'transactions')]
 class Transaction
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
+
+    #[ORM\OneToOne(targetEntity: Payment::class, inversedBy: 'transaction', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(name: 'payment_id', referencedColumnName: 'id', nullable: true, onDelete: 'CASCADE')]
+    private ?Payment $payment = null;
+
+    #[ORM\OneToOne(targetEntity: Installment::class, inversedBy: 'transact', cascade: ['persist', 'remove'])]
+    #[ORM\JoinColumn(name: 'installment_id', referencedColumnName: 'id', nullable: true, onDelete: 'CASCADE')]
+    private ?Installment $installment = null;
 
     #[ORM\Column(length: 255)]
     private ?string $amount = null;
@@ -50,9 +58,6 @@ class Transaction
     #[ORM\Column(length: 255)]
     private ?string $secureHash = null;
 
-    #[ORM\OneToOne(targetEntity: OrderHistory::class, mappedBy: 'transact', cascade: ['persist', 'remove'])]
-    private ?OrderHistory $orderHistory = null;
-
     public function getId(): ?int
     {
         return $this->id;
@@ -63,6 +68,16 @@ class Transaction
         $this->id = $id;
 
         return $this;
+    }
+
+    public function getPayment(): ?Payment
+    {
+        return $this->payment;
+    }
+
+    public function setPayment(?Payment $payment): void
+    {
+        $this->payment = $payment;
     }
 
     public function getAmount(): ?string
@@ -209,24 +224,14 @@ class Transaction
         return $this;
     }
 
-    public function getOrderHistory(): ?OrderHistory
+    public function getInstallment(): ?Installment
     {
-        return $this->orderHistory;
+        return $this->installment;
     }
 
-    public function setOrderHistory(?OrderHistory $orderHistory): static
+    public function setInstallment(?Installment $installment): static
     {
-        // unset the owning side of the relation if necessary
-        if ($orderHistory === null && $this->orderHistory !== null) {
-            $this->orderHistory->setTransact(null);
-        }
-
-        // set the owning side of the relation if necessary
-        if ($orderHistory !== null && $orderHistory->getTransact() !== $this) {
-            $orderHistory->setTransact($this);
-        }
-
-        $this->orderHistory = $orderHistory;
+        $this->installment = $installment;
 
         return $this;
     }

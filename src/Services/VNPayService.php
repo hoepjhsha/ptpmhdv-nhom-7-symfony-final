@@ -78,6 +78,11 @@ class VNPayService
         return $vnp_Url;
     }
 
+    public function setVnpReturnurl(string $vnp_Returnurl): void
+    {
+        $this->vnp_Returnurl = $vnp_Returnurl;
+    }
+
     public function getVnpHashSecret(): string
     {
         return $this->vnp_HashSecret;
