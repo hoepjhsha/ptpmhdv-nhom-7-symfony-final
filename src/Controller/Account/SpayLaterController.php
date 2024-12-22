@@ -113,6 +113,10 @@ class SpayLaterController extends BaseController
                     return $this->redirectToRoute('app_login');
                 }
 
+//                $user->setCreditLimit($user->getCreditLimit() + 72000);
+//
+//                dd($user->getCreditLimit());
+
                 $transaction = new Transaction();
                 $transaction->setAmount($data['vnp_Amount']);
                 $transaction->setBankCode($data['vnp_BankCode']);
@@ -164,6 +168,7 @@ class SpayLaterController extends BaseController
                 }
 
                 $user->setCreditLimit($user->getCreditLimit() + $total_amount);
+                $this->em->flush();
 
                 $this->addFlash('success', 'Paid successful! Your installment has been paid.');
             } else {
