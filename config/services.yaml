@@ -32,5 +32,9 @@ services:
             $em: '@Doctrine\ORM\EntityManagerInterface'
             $SPayLater_installment_conversion_fee: '%env(SPayLater_installment_conversion_fee)%'
             $SpayLater_late_fee: '%env(SpayLater_late_fee)%'
+
+    App\Event\Listener\ExceptionListener:
+        tags:
+            - { name: 'kernel.event_listener', event: 'kernel.exception' }
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
