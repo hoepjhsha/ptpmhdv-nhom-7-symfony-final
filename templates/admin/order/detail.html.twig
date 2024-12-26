@@ -1,0 +1,60 @@
+{% extends "_layouts/admin/main.html.twig" %}
+
+{% block title %}
+    Orders {{ parent() }}
+{% endblock %}
+
+{% block main %}
+
+    <div class="row">
+        <div class="col-7">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h4 class="card-title">Detail order: {{ order.id }}</h4>
+                </div><!--end card-header-->
+                <div class="card-body">
+                    <div class="row">
+                        <div class="table-responsive">
+                            <table class="table table-striped mb-0">
+                                <tr>
+                                    <td>Id:</td>
+                                    <td>{{ order.id }}</td>
+                                </tr>
+                                <tr>
+                                    <td>User:</td>
+                                    <td>{{ order.user.username }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Order Items:</td>
+                                    <td>
+                                        {% for value in order.orderItems %}
+                                            {{ value is iterable ? value.itemName : value }}{% if not loop.last %}, {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Status:</td>
+                                    <td>{{ order.status }}</td>
+                                </tr>
+                                <tr>
+                                    <td>Total Amount:</td>
+                                    <td>{{ order.totalAmount }}</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div><!--end row-->
+                </div>
+                <div class="card-footer">
+                    <div class="row">
+                        <div class="button-items d-flex align-items-center justify-content-center gap-3">
+                            <a href="{{ url('admin_order_update', {id: order.id}) }}" type="button" class="btn btn-warning text-white btn-lg col-1">Edit</a>
+
+                            <a href="{{ url('admin_order_list') }}" type="button" class="btn btn-primary btn-lg">Back</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- end col -->
+    </div> <!-- end row -->
+
+{% endblock %}

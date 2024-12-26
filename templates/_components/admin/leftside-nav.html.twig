@@ -34,6 +34,14 @@
                             <li><a href="{{ url('admin_category_create') }}">Add a new category</a></li>
                         </ul>
                     </li>
+                    <li>
+                        <a href="javascript: void(0);"><i class="ti-control-record"></i>Users<span class="menu-arrow left-has-menu"><i class="mdi mdi-chevron-right"></i></span></a>
+                        <ul class="nav-second-level" aria-expanded="false">
+                            <li><a href="{{ url('admin_user_list') }}">List</a></li>
+                            <li><a href="{{ url('admin_user_create') }}">Add a new user</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url('admin_order_list') }}"><i class="ti-control-record"></i>Orders</a></li>
                 </ul>
             </li>
         </ul>

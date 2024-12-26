@@ -1,0 +1,105 @@
+{% extends "_layouts/admin/main.html.twig" %}
+
+{% block title %}
+    Orders {{ parent() }}
+{% endblock %}
+
+{% block stylesheets %}
+    <!-- DataTables -->
+    <link href="{{ asset('plugins/datatables/dataTables.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('plugins/datatables/buttons.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
+
+    <!-- App css -->
+    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/icons.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/metisMenu.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('plugins/daterangepicker/daterangepicker.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/app.min.css') }}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block javascripts %}
+    <!-- jQuery  -->
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
+    <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('js/metismenu.min.js') }}"></script>
+    <script src="{{ asset('js/waves.js') }}"></script>
+    <script src="{{ asset('js/feather.min.js') }}"></script>
+    <script src="{{ asset('js/simplebar.min.js') }}"></script>
+    <script src="{{ asset('js/moment.js') }}"></script>
+    <script src="{{ asset('plugins/daterangepicker/daterangepicker.js') }}"></script>
+
+    <!-- Required datatable js -->
+    <script src="{{ asset('plugins/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('plugins/datatables/dataTables.bootstrap5.min.js') }}"></script>
+
+    <!-- App js -->
+    <script src="{{ asset('js/app.js') }}"></script>
+    <script>
+        $('#datatable').DataTable();
+    </script>
+
+    {% include "_widgets/sweetalert2.html.twig" %}
+{% endblock %}
+
+{% block main %}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h4 class="card-title">Default Datatable</h4>
+                </div><!--end card-header-->
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="datatable" class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>User</th>
+                                    <th>Order Items</th>
+                                    <th>Status</th>
+                                    <th>Total Amount</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                {% for order in orders %}
+                                    <tr>
+                                        <td>{{ order.id }}</td>
+                                        <td>{{ order.user.username }}</td>
+                                        <td>
+                                            {% for value in order.orderItems %}
+                                                {{ value is iterable ? value.itemName : value }}{% if not loop.last %}, {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                        <td>{{ order.status }}</td>
+                                        <td>{{ order.totalAmount }}</td>
+                                        <td>
+                                            <a href="{% if order.status != 2 %}{{ url('admin_order_update', {id: order.id}) }}{% else %}#{% endif %}" ><i class="las la-pen text-secondary font-16"></i></a>
+                                            <a href="{{ url('admin_order_view', {id: order.id}) }}" class="ms-2"><i class="las la-eye text-danger font-16"></i></a>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+
+                            </tbody>
+
+                            <tfoot>
+                            <tr>
+                                <th></th>
+                                <th>Code</th>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Action</th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- end col -->
+    </div> <!-- end row -->
+
+{% endblock %}

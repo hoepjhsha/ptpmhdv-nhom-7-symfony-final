@@ -1,0 +1,146 @@
+{% extends "_layouts/admin/main.html.twig" %}
+
+{% block title %}
+    Users {{ parent() }}
+{% endblock %}
+
+{% block stylesheets %}
+    <!-- DataTables -->
+    <link href="{{ asset('plugins/datatables/dataTables.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('plugins/datatables/buttons.bootstrap5.min.css') }}" rel="stylesheet" type="text/css" />
+
+    <!-- App css -->
+    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/icons.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/metisMenu.min.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('plugins/daterangepicker/daterangepicker.css') }}" rel="stylesheet" type="text/css" />
+    <link href="{{ asset('css/app.min.css') }}" rel="stylesheet" type="text/css" />
+{% endblock %}
+
+{% block javascripts %}
+    <!-- jQuery  -->
+    <script src="{{ asset('js/jquery.min.js') }}"></script>
+    <script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('js/metismenu.min.js') }}"></script>
+    <script src="{{ asset('js/waves.js') }}"></script>
+    <script src="{{ asset('js/feather.min.js') }}"></script>
+    <script src="{{ asset('js/simplebar.min.js') }}"></script>
+    <script src="{{ asset('js/moment.js') }}"></script>
+    <script src="{{ asset('plugins/daterangepicker/daterangepicker.js') }}"></script>
+
+    <!-- Required datatable js -->
+    <script src="{{ asset('plugins/datatables/jquery.dataTables.min.js') }}"></script>
+    <script src="{{ asset('plugins/datatables/dataTables.bootstrap5.min.js') }}"></script>
+
+    <!-- App js -->
+    <script src="{{ asset('js/app.js') }}"></script>
+    <script>
+        $('#datatable').DataTable();
+    </script>
+
+    {% include "_widgets/sweetalert2.html.twig" %}
+{% endblock %}
+
+{% block main %}
+
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header d-flex align-items-center justify-content-between">
+                    <h4 class="card-title">Default Datatable</h4>
+                    <div class="button-items">
+                        <a href="{{ url('admin_user_create') }}" type="button" class="btn btn-outline-primary">Add a new user</a>
+                    </div>
+                </div><!--end card-header-->
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="datatable" class="table table-bordered">
+                            <thead>
+                                <tr>
+                                    <th></th>
+                                    <th>Username</th>
+                                    <th>Password</th>
+                                    <th>Roles</th>
+                                    <th>Status</th>
+                                    <th>Credit limit</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+
+                            <tbody>
+
+                                {% for user in users %}
+                                    <tr>
+                                        <td>{{ user.id }}</td>
+                                        <td>{{ user.username }}</td>
+                                        <td>{{ user.password }}</td>
+                                        <td>
+                                            {% for role in user.roles %}
+                                                {{ role }}{% if not loop.last %}, {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                        <td>{{ user.status }}</td>
+                                        <td>{{ user.creditLimit }}</td>
+                                        <td>
+                                            <a href="{{ url('admin_user_update', {id: user.id}) }}"><i class="las la-pen text-secondary font-16"></i></a>
+                                            <a onclick="confirmDelete{{ user.id }}()" style="cursor: pointer;"><i class="las la-trash-alt text-secondary font-16"></i></a>
+
+                                            <form id="delete-form-{{ user.id }}" method="post" action="{{ url('admin_user_delete', {id: user.id}) }}">
+                                                <input type="hidden" name="_delete_id" value="{{ user.id }}">
+                                            </form>
+                                            <script>
+                                                function confirmDelete{{ user.id }}() {
+                                                    const swalWithBootstrapButtons = Swal.mixin({
+                                                        customClass: {
+                                                            confirmButton: 'btn btn-primary mr-10 me-1',
+                                                            cancelButton: 'btn btn-danger mr-10 me-1'
+                                                        },
+                                                        buttonsStyling: false
+                                                    });
+                                                    swalWithBootstrapButtons.fire({
+                                                        title: "Are you sure you want to delete?",
+                                                        text: "This action can not be reverted!",
+                                                        icon: "warning",
+                                                        showCancelButton: true,
+                                                        confirmButtonText: "Yes, delete it!",
+                                                        cancelButtonText: "No, cancel!",
+                                                        reverseButtons: true
+                                                    }).then((result) => {
+                                                        if (result.isConfirmed) {
+                                                            document.getElementById('delete-form-{{ user.id }}').submit();
+                                                        } else if (
+                                                            result.dismiss === Swal.DismissReason.cancel
+                                                        ) {
+                                                            swalWithBootstrapButtons.fire({
+                                                                title: "Cancelled",
+                                                                text: "This action has been cancelled :)",
+                                                                icon: "error"
+                                                            });
+                                                        }
+                                                    });
+                                                }
+                                            </script>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+
+                            </tbody>
+
+                            <tfoot>
+                            <tr>
+                                <th></th>
+                                <th>Code</th>
+                                <th>Product Name</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Action</th>
+                            </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div> <!-- end col -->
+    </div> <!-- end row -->
+
+{% endblock %}
